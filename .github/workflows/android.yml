@@ -36,6 +36,11 @@ jobs:
 
         yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "platforms;android-34" "build-tools;34.0.0"
 
+    - name: Install Android Gradle Plugin
+      run: |
+        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_HOME "extras;google;m2repository"
+        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_HOME "extras;android;m2repository"
+
     - name: Build Debug APK
       run: ./gradlew assembleDebug
 
