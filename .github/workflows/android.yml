@@ -9,6 +9,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: TimeWallet
+
     steps:
     - name: Checkout
       uses: actions/checkout@v4
