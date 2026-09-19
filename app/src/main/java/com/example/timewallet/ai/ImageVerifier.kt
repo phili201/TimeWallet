@@ -5,6 +5,9 @@ import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.label.ImageLabelerOptions
 import com.google.mlkit.vision.label.ImageLabeling
 import kotlinx.coroutines.tasks.await
+import com.google.mlkit.vision.label.ImageLabelerOptions
+import kotlinx.coroutines.tasks.await
+
 
 class ImageVerifier {
 
