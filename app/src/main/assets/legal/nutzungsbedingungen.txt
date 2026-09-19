@@ -1,0 +1,10 @@
+Nutzungsbedingungen
+
+Durch die Nutzung dieser App erklärt sich der Nutzer mit folgenden Bedingungen einverstanden:
+
+1. Die App darf ausschließlich für private Zwecke genutzt werden.
+2. Eine Weitergabe, Veränderung, Dekompilierung oder kommerzielle Nutzung der App ist nicht gestattet.
+3. Der Nutzer ist selbst verantwortlich für die korrekte Nutzung der App.
+4. Der Entwickler übernimmt keine Verantwortung für Fehlverhalten, Missbrauch oder technische Probleme.
+5. Die App darf nicht zur Umgehung von Sicherheitssystemen oder zur Manipulation anderer Anwendungen genutzt werden.
+6. Die App speichert ausschließlich lokale Daten, die nicht an externe Server übertragen werden.

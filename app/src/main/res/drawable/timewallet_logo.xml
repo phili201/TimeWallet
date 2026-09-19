@@ -1,0 +1,21 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="240dp"
+    android:height="240dp"
+    android:viewportWidth="240"
+    android:viewportHeight="240">
+
+    <!-- Neon Glow Circle -->
+    <path
+        android:fillColor="#00E5FF"
+        android:fillAlpha="0.15"
+        android:pathData="M120,20 A100,100 0 1,1 119.9,20"/>
+
+    <!-- TimeWallet Symbol -->
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M60,120 L180,120 L180,140 L60,140z"/>
+
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M90,80 L150,80 L150,100 L90,100z"/>
+</vector>

@@ -1,5 +1,9 @@
 <resources>
-    <style name="Theme.TimeWallet" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your theme here -->
+    <style name="Theme.TimeWallet" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">#00E5FF</item>
+        <item name="colorSecondary">#00B8D4</item>
+        <item name="android:statusBarColor">#000000</item>
+        <item name="android:navigationBarColor">#000000</item>
+        <item name="android:windowBackground">#0D0D0D</item>
     </style>
 </resources>

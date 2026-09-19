@@ -1,0 +1,12 @@
+Haftungsausschluss
+
+Diese Anwendung wird ohne jegliche Garantie bereitgestellt. Der Entwickler übernimmt keine Haftung für Schäden, Datenverluste, Fehlfunktionen oder unerwünschte Auswirkungen, die durch die Nutzung dieser App entstehen können. Die Nutzung erfolgt auf eigene Verantwortung.
+
+Der Entwickler haftet nicht für:
+– fehlerhafte Nutzung der App
+– technische Probleme des Geräts
+– Manipulationen durch Dritte
+– Datenverlust oder Systemfehler
+– Fehlinterpretationen der App-Funktionen
+
+Die App speichert Daten ausschließlich lokal auf dem Gerät des Nutzers. Es findet keine Übertragung an externe Server statt.

@@ -1,0 +1,6 @@
+<resources>
+    <style name="Theme.TimeWallet.Splash" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="android:windowBackground">@drawable/splash_background</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
+</resources>

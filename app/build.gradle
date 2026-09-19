@@ -59,3 +59,12 @@ dependencies {
     implementation "com.microsoft.onnxruntime:onnxruntime-android:1.17.0"
     implementation 'com.google.mlkit:image-labeling:17.0.7'
 }
+implementation "com.google.mlkit:image-labeling:17.0.7"
+implementation "com.google.mlkit:face-detection:16.1.5"
+buildTypes {
+    release {
+        minifyEnabled true
+        shrinkResources true
+        proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+    }
+}

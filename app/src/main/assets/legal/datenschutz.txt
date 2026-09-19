@@ -1,0 +1,17 @@
+Datenschutzerklärung
+
+Diese App verarbeitet ausschließlich lokale Daten auf dem Gerät des Nutzers. Es werden keine personenbezogenen Daten an externe Server übertragen, gespeichert oder weitergegeben.
+
+Gespeicherte Daten:
+– Sitzungsinformationen (Dauer, Score)
+– Coin-Daten
+– App-Einstellungen
+– Blocker-Status
+
+Es findet keine:
+– Internetverbindung
+– Cloud-Speicherung
+– Analyse durch Dritte
+– Weitergabe von Daten
+
+Der Nutzer kann alle gespeicherten Daten jederzeit löschen, indem er die App deinstalliert.
