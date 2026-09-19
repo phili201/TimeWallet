@@ -29,7 +29,7 @@
 
         <!-- ACCESSIBILITY SERVICE -->
         <service
-            android:name=".blocker.SocialBlockerService"
+            android:name=".service.SocialBlockerService"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
             android:exported="false">
             <intent-filter>
@@ -39,6 +39,7 @@
                 android:name="android.accessibilityservice"
                 android:resource="@xml/accessibility_service_config" />
         </service>
+
 
         <!-- GUARD SERVICE -->
         <service

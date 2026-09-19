@@ -39,7 +39,6 @@
             android:textColor="#FFFFFF"
             android:layout_marginTop="12dp"/>
 
-        <!-- Legal Button INSIDE the layout -->
         <Button
             android:id="@+id/btnLegal"
             android:text="Rechtliches"
