@@ -14,85 +14,58 @@
         android:label="TimeWallet"
         android:theme="@style/Theme.TimeWallet">
 
+        <!-- MAIN ACTIVITY -->
         <activity
-            android:name=".ui.MainActivity"
+            android:name=".ui.SplashActivity"
             android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
+        <activity android:name=".ui.MainActivity" android:exported="false" />
+        <activity android:name=".camera.CameraActivity" android:exported="false" />
+
+        <!-- ACCESSIBILITY SERVICE -->
         <service
-            android:name=".service.SocialBlockerService"
+            android:name=".blocker.SocialBlockerService"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />
             </intent-filter>
-
             <meta-data
                 android:name="android.accessibilityservice"
                 android:resource="@xml/accessibility_service_config" />
         </service>
 
-    <service 
-        android:name=".blocker.SocialBlockerService" 
-        android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE" 
-        android:exported="false"> 
-        <intent-filter> 
-            <action android:name="android.accessibilityservice.AccessibilityService" /> 
-        </intent-filter> 
-        <meta-data 
-            android:name="android.accessibilityservice" 
-            android:resource="@xml/accessibility_service_config" /> 
-    </service>
-    <activity android:name=".CameraActivity" />
-    <activity android:name=".camera.CameraActivity" />
-    <service android:name=".security.GuardService" 
-             android:exported="false" />
-    </application>
-    <provider
-        android:name="androidx.core.content.FileProvider"
-        android:authorities="${applicationId}.provider"
-        android:exported="false"
-        android:grantUriPermissions="true">
-        <meta-data
-            android:name="android.support.FILE_PROVIDER_PATHS"
-            android:resource="@xml/file_paths"/>
-    </provider>
+        <!-- GUARD SERVICE -->
+        <service
+            android:name=".security.GuardService"
+            android:exported="false" />
 
+        <!-- BOOT RECEIVER -->
+        <receiver
+            android:name=".blocker.BootReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- FILE PROVIDER -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"/>
+        </provider>
+
+    </application>
 
 </manifest>
-<receiver
-    android:name=".blocker.BootReceiver"
-    android:enabled="true"
-    android:exported="true">
-    <intent-filter>
-        <action android:name="android.intent.action.BOOT_COMPLETED" />
-    </intent-filter>
-</receiver>
-<service
-    android:name=".blocker.SocialBlockerService"
-    android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
-    android:exported="false">
-    <intent-filter>
-        <action android:name="android.accessibilityservice.AccessibilityService" />
-    </intent-filter>
-</service>
-<activity
-    android:name=".ui.SplashActivity"
-    android:exported="true">
-    <intent-filter>
-        <action android:name="android.intent.action.MAIN"/>
-        <category android:name="android.intent.category.LAUNCHER"/>
-    </intent-filter>
-</activity>
-<activity
-    android:name=".ui.SplashActivity"
-    android:exported="true">
-    <intent-filter>
-        <action android:name="android.intent.action.MAIN"/>
-        <category android:name="android.intent.category.LAUNCHER"/>
-    </intent-filter>
-</activity>
