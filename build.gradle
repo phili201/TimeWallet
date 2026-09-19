@@ -1,18 +1,12 @@
+// Root build.gradle – darf KEINE Android-Plugins enthalten
+
 plugins {
-    id 'com.android.application'
-    id 'org.jetbrains.kotlin.android'
+    // NICHTS hier eintragen
 }
 
-
-android {
-    namespace 'com.timewallet'
-    compileSdk 34
-
-    defaultConfig {
-        applicationId "com.timewallet"
-        minSdk 24
-        targetSdk 34
-        versionCode 1
-        versionName "1.0"
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
     }
 }
