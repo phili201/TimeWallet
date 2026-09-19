@@ -7,15 +7,21 @@ import com.example.timewallet.data.AppDatabase
 class TimeWalletApp : Application() {
 
     lateinit var database: AppDatabase
-        private set
+    lateinit var repository: TimeWalletRepository
 
     override fun onCreate() {
         super.onCreate()
 
         database = Room.databaseBuilder(
-            applicationContext,
+            this,
             AppDatabase::class.java,
             "timewallet.db"
         ).build()
+
+        repository = TimeWalletRepository(
+            database.coinDao(),
+            database.sessionDao()
+        )
     }
 }
+

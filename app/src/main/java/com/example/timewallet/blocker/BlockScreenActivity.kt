@@ -3,6 +3,8 @@ package com.example.timewallet.blocker
 import android.app.Activity
 import android.os.Bundle
 import com.example.timewallet.databinding.ActivityBlockScreenBinding
+import androidx.activity.viewModels
+import androidx.lifecycle.observe
 
 class BlockScreenActivity : Activity() {
 

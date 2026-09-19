@@ -4,6 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import com.example.timewallet.databinding.ActivitySplashBinding
+import androidx.activity.viewModels
+import androidx.lifecycle.observe
 
 class SplashActivity : ComponentActivity() {
 

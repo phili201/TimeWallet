@@ -8,6 +8,7 @@ import com.example.timewallet.databinding.ActivityMainBinding
 import com.example.timewallet.timer.TimerViewModel
 import com.example.timewallet.timer.TimerViewModelFactory
 import com.example.timewallet.camera.CameraActivity
+import androidx.lifecycle.observe
 
 class MainActivity : ComponentActivity() {
 

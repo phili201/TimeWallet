@@ -6,6 +6,8 @@ import androidx.lifecycle.lifecycleScope
 import com.example.timewallet.TimeWalletApp
 import com.example.timewallet.databinding.ActivityBlockScreenBinding
 import kotlinx.coroutines.launch
+import androidx.activity.viewModels
+import androidx.lifecycle.observe
 
 class BlockScreenActivity : ComponentActivity() {
 

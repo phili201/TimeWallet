@@ -6,6 +6,8 @@ import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.timewallet.TimeWalletApp
 import com.example.timewallet.databinding.ActivityCoinHistoryBinding
+import androidx.lifecycle.observe
+
 
 class CoinHistoryActivity : ComponentActivity() {
 

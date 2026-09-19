@@ -3,6 +3,8 @@ package com.example.timewallet.ui.legal
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import com.example.timewallet.databinding.ActivityLegalViewerBinding
+import androidx.activity.viewModels
+import androidx.lifecycle.observe
 
 class LegalViewerActivity : ComponentActivity() {
 

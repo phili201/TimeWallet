@@ -15,6 +15,7 @@ import com.example.timewallet.timer.TimerViewModelFactory
 import kotlinx.coroutines.launch
 import android.view.animation.AnimationUtils
 import java.io.File
+import androidx.lifecycle.observe
 
 class MainActivity : ComponentActivity() {
 
