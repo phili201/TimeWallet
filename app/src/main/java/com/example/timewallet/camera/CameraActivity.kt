@@ -39,7 +39,7 @@ class CameraActivity : Activity() {
             val cameraProvider = cameraProviderFuture.get()
 
             val preview = Preview.Builder().build().also {
-                it.setSurfaceProvider(binding.cameraPreview.surfaceTextureListener)
+                it.setSurfaceProvider(binding.cameraPreview.surfaceProvider)
             }
 
             imageCapture = ImageCapture.Builder().build()

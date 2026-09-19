@@ -1,50 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:background="#0D0D0D"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="16dp">
 
     <LinearLayout
         android:orientation="vertical"
-        android:padding="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <!-- Score Card -->
-        <include layout="@layout/card_panel"/>
-
         <TextView
-            android:id="@+id/scoreEmoji"
-            android:text="🔥"
-            android:textSize="40sp"
-            android:textColor="#00E5FF"
-            android:layout_marginTop="12dp"/>
-
-        <ProgressBar
-            android:id="@+id/scoreBar"
-            android:layout_width="match_parent"
-            android:layout_height="10dp"
-            android:max="100"
-            android:progress="0"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:progressTint="#00E5FF"
-            android:layout_marginTop="4dp"/>
-
-        <!-- Social Media Timer Card -->
-        <include layout="@layout/card_panel"/>
-
-        <TextView
-            android:id="@+id/socialTimer"
-            android:text="0 min"
+            android:id="@+id/coinText"
+            android:text="0 Coins"
             android:textSize="24sp"
+            android:textColor="#FFFFFF"/>
+
+        <TextView
+            android:id="@+id/statusText"
+            android:text=""
+            android:textSize="18sp"
+            android:textColor="#00E5FF"
+            android:layout_marginTop="8dp"/>
+
+        <TextView
+            android:id="@+id/timerText"
+            android:text="0 min"
+            android:textSize="20sp"
             android:textColor="#FFFFFF"
+            android:layout_marginTop="8dp"/>
+
+        <EditText
+            android:id="@+id/taskInput"
+            android:hint="Aufgabe"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"/>
+
+        <EditText
+            android:id="@+id/minutesInput"
+            android:hint="Minuten"
+            android:inputType="number"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <Button
+            android:id="@+id/startSessionButton"
+            android:text="Session starten"
             android:layout_marginTop="12dp"/>
 
         <Button
-            android:id="@+id/btnLegal"
-            android:text="Rechtliches"
-            android:backgroundTint="#00E5FF"
-            android:textColor="#000000"
+            android:id="@+id/endSessionButton"
+            android:text="Session beenden (Foto)"
+            android:layout_marginTop="12dp"/>
+
+        <EditText
+            android:id="@+id/buyMinutesInput"
+            android:hint="Social Media Minuten kaufen"
+            android:inputType="number"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="24dp"/>
+
+        <Button
+            android:id="@+id/buySocialButton"
+            android:text="Kaufen"
+            android:layout_marginTop="12dp"/>
 
     </LinearLayout>
 </ScrollView>

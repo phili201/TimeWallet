@@ -8,28 +8,45 @@ import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
 import kotlinx.coroutines.tasks.await
 
+data class ProductivityScore(
+    val score: Int,
+    val reason: String
+)
+
 class SessionVerifier {
 
-    suspend fun verifySession(bitmap: Bitmap): Boolean {
-        val faceDetected = detectFace(bitmap)
-        val productiveDetected = detectProductiveScene(bitmap)
-        return faceDetected && productiveDetected
+    private suspend fun detectFace(bitmap: Bitmap): Boolean {
+        val detector = FaceDetection.getClient(
+            FaceDetectorOptions.Builder()
+                .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
+                .build()
+        )
+        val faces = detector.process(InputImage.fromBitmap(bitmap, 0)).await()
+        return faces.isNotEmpty()
+    }
+
+    private suspend fun detectScene(bitmap: Bitmap): Boolean {
+        val labeler = ImageLabeling.getClient(ImageLabelerOptions.DEFAULT_OPTIONS)
+        val labels = labeler.process(InputImage.fromBitmap(bitmap, 0)).await()
+        val names = labels.map { it.text.lowercase() }
+        val productive = listOf("laptop", "computer", "desk", "book", "notebook", "paper")
+        return names.any { it in productive }
     }
 
     suspend fun calculateScore(bitmap: Bitmap): ProductivityScore {
         var score = 0
         val reasons = mutableListOf<String>()
 
-        val faceDetected = detectFace(bitmap)
-        if (faceDetected) {
+        val face = detectFace(bitmap)
+        if (face) {
             score += 40
             reasons.add("Gesicht erkannt")
         } else {
             reasons.add("Kein Gesicht erkannt")
         }
 
-        val productiveDetected = detectProductiveScene(bitmap)
-        if (productiveDetected) {
+        val scene = detectScene(bitmap)
+        if (scene) {
             score += 40
             reasons.add("Produktive Umgebung erkannt")
         } else {
@@ -39,39 +56,19 @@ class SessionVerifier {
         val brightness = bitmap.getPixel(bitmap.width / 2, bitmap.height / 2) and 0xFF
         if (brightness > 40) {
             score += 10
-            reasons.add("Bild ausreichend hell")
+            reasons.add("Bild hell genug")
         } else {
             reasons.add("Bild zu dunkel")
         }
 
-        val sharpEnough = bitmap.width > 200 && bitmap.height > 200
-        if (sharpEnough) {
+        val sharp = bitmap.width > 200 && bitmap.height > 200
+        if (sharp) {
             score += 10
             reasons.add("Bild scharf genug")
         } else {
-            reasons.add("Bild zu unscharf")
+            reasons.add("Bild unscharf")
         }
 
         return ProductivityScore(score, reasons.joinToString(", "))
-    }
-
-    // --- Hilfsfunktionen ---
-    private suspend fun detectFace(bitmap: Bitmap): Boolean {
-        val faceDetector = FaceDetection.getClient(
-            FaceDetectorOptions.Builder()
-                .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
-                .build()
-        )
-        val faces = faceDetector.process(InputImage.fromBitmap(bitmap, 0)).await()
-        return faces.isNotEmpty()
-    }
-
-    private suspend fun detectProductiveScene(bitmap: Bitmap): Boolean {
-        val labeler = ImageLabeling.getClient(ImageLabelerOptions.DEFAULT_OPTIONS)
-        val labels = labeler.process(InputImage.fromBitmap(bitmap, 0)).await()
-        val names = labels.map { it.text.lowercase() }
-
-        val productiveObjects = listOf("laptop", "computer", "desk", "book", "notebook", "paper")
-        return names.any { it in productiveObjects }
     }
 }

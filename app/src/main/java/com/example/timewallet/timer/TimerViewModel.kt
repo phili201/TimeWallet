@@ -93,22 +93,4 @@ class TimerViewModel(
         if (minutes >= 60) coins += 10
         return coins
     }
-
-    fun buySocialTime(minutes: Int) {
-        viewModelScope.launch {
-            val success = coinsRepo.removeCoins(minutes)
-
-            if (success) {
-                _state.value = _state.value.copy(
-                    message = "$minutes Minuten Social Media gekauft!"
-                )
-            } else {
-                _state.value = _state.value.copy(
-                    message = "Nicht genug Coins!"
-                )
-            }
-
-            loadCoins()
-        }
-    }
 }

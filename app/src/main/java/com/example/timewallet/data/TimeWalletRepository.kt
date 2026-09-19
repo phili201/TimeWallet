@@ -12,7 +12,6 @@ class TimeWalletRepository(
     private val sessionDao: SessionDao
 ) {
 
-    // --- Heartbeat (Notfallmodus) ---
     @Volatile
     private var lastHeartbeat: Long = 0L
 
@@ -25,7 +24,6 @@ class TimeWalletRepository(
         return now - lastHeartbeat <= timeoutMs
     }
 
-    // --- Coins ---
     suspend fun addCoins(amount: Int, reason: String) {
         val entry = CoinEntry(
             amount = amount,
@@ -37,9 +35,9 @@ class TimeWalletRepository(
 
     fun getCoinHistory() = coinDao.getHistory()
 
-    // --- Social Media Minuten ---
-    @Volatile
-    private var socialMediaMinutes: Int = 0
+    @Volatile var socialMediaMinutes: Int = 0
+    @Volatile var sessionRunning: Boolean = false
+    @Volatile var sessionValid: Boolean = false
 
     private val _socialMinutesFlow = MutableStateFlow(socialMediaMinutes)
     val socialMinutesFlow: StateFlow<Int> = _socialMinutesFlow
@@ -55,15 +53,6 @@ class TimeWalletRepository(
         return socialMediaMinutes > 0 && sessionValid && !sessionRunning
     }
 
-    // --- Session Status ---
-    @Volatile var sessionRunning: Boolean = false
-    @Volatile var sessionValid: Boolean = false
-
-    fun allowSocialMedia(): Boolean {
-        return socialMediaMinutes > 0 && sessionValid && !sessionRunning
-    }
-
-    // --- Sessions ---
     suspend fun addSession(minutes: Int, score: Int, valid: Boolean) {
         sessionDao.insert(
             SessionEntry(
