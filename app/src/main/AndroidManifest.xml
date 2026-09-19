@@ -40,8 +40,7 @@
         <!-- Block Screen -->
         <activity
             android:name=".blocker.BlockScreenActivity"
-            android:exported="false"
-            android:theme="@style/Theme.TimeWallet.Blocker" />
+            android:exported="false" />
 
         <!-- Accessibility Blocker -->
         <service
