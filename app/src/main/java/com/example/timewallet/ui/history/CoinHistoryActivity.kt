@@ -2,19 +2,18 @@ package com.example.timewallet.ui.history
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.timewallet.TimeWalletApp
 import com.example.timewallet.databinding.ActivityCoinHistoryBinding
-import androidx.lifecycle.observe
-
+import kotlinx.coroutines.launch
 
 class CoinHistoryActivity : ComponentActivity() {
 
     private lateinit var binding: ActivityCoinHistoryBinding
 
-    private val viewModel: CoinHistoryViewModel by viewModels {
-        CoinHistoryViewModelFactory(application as TimeWalletApp)
+    private val viewModel by lazy {
+        CoinHistoryViewModel(application as TimeWalletApp)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,8 +26,10 @@ class CoinHistoryActivity : ComponentActivity() {
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         binding.recyclerView.adapter = adapter
 
-        viewModel.history.collect { list ->
-            adapter.submitList(list)
+        lifecycleScope.launch {
+            viewModel.history.collect { list ->
+                adapter.submitList(list)
+            }
         }
     }
 }
