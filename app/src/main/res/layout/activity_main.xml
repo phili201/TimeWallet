@@ -1,70 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="24dp"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
-    <LinearLayout
-        android:orientation="vertical"
+    <TextView
+        android:id="@+id/coinsText"
+        android:text="Coins: 0"
+        android:textSize="22sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/messageText"
+        android:text=""
+        android:textSize="18sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="12dp" />
+
+    <EditText
+        android:id="@+id/taskInput"
+        android:hint="Aufgabe"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:paddingTop="16dp" />
 
-        <TextView
-            android:id="@+id/coinText"
-            android:text="0 Coins"
-            android:textSize="24sp"
-            android:textColor="#FFFFFF"/>
+    <EditText
+        android:id="@+id/durationInput"
+        android:hint="Minuten"
+        android:inputType="number"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp" />
 
-        <TextView
-            android:id="@+id/statusText"
-            android:text=""
-            android:textSize="18sp"
-            android:textColor="#00E5FF"
-            android:layout_marginTop="8dp"/>
+    <Button
+        android:id="@+id/startSessionButton"
+        android:text="Session starten"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="16dp" />
 
-        <TextView
-            android:id="@+id/timerText"
-            android:text="0 min"
-            android:textSize="20sp"
-            android:textColor="#FFFFFF"
-            android:layout_marginTop="8dp"/>
+    <Button
+        android:id="@+id/finishSessionButton"
+        android:text="Session abschließen"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp" />
 
-        <EditText
-            android:id="@+id/taskInput"
-            android:hint="Aufgabe"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"/>
+</LinearLayout>
 
-        <EditText
-            android:id="@+id/minutesInput"
-            android:hint="Minuten"
-            android:inputType="number"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
-        <Button
-            android:id="@+id/startSessionButton"
-            android:text="Session starten"
-            android:layout_marginTop="12dp"/>
-
-        <Button
-            android:id="@+id/endSessionButton"
-            android:text="Session beenden (Foto)"
-            android:layout_marginTop="12dp"/>
-
-        <EditText
-            android:id="@+id/buyMinutesInput"
-            android:hint="Social Media Minuten kaufen"
-            android:inputType="number"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"/>
-
-        <Button
-            android:id="@+id/buySocialButton"
-            android:text="Kaufen"
-            android:layout_marginTop="12dp"/>
-
-    </LinearLayout>
-</ScrollView>

@@ -11,6 +11,7 @@ import com.example.timewallet.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.example.timewallet.ui.block.BlockScreenActivity
 
 class SocialBlockerService : AccessibilityService() {
 

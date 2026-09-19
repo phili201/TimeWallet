@@ -14,8 +14,6 @@ import com.example.timewallet.databinding.ActivityCameraBinding
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
-import androidx.activity.viewModels
-import androidx.lifecycle.observe
 
 class CameraActivity : Activity() {
 
