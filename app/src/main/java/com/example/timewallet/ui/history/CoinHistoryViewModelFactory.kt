@@ -4,12 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.timewallet.TimeWalletApp
 
-class CoinHistoryViewModelFactory(
+class SessionHistoryViewModelFactory(
     private val app: TimeWalletApp
 ) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return CoinHistoryViewModel(app) as T
+        return SessionHistoryViewModel(app) as T
     }
 }
-

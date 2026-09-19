@@ -4,18 +4,19 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.viewModels
+import androidx.lifecycle.lifecycleScope
+import com.example.timewallet.TimeWalletApp
 import com.example.timewallet.databinding.ActivityMainBinding
 import com.example.timewallet.timer.TimerViewModel
 import com.example.timewallet.timer.TimerViewModelFactory
-import com.example.timewallet.camera.CameraActivity
-import androidx.lifecycle.observe
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
     private val viewModel: TimerViewModel by viewModels {
-        TimerViewModelFactory(application as com.example.timewallet.TimeWalletApp)
+        TimerViewModelFactory(application as TimeWalletApp)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,33 +25,22 @@ class MainActivity : ComponentActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Coins laden
-        viewModel.loadCoins()
-
-        // UI-Updates
-        viewModel.state.observe(this) { state ->
-            binding.coinText.text = "${state.coins} Coins"
-            binding.statusText.text = state.message ?: ""
-            binding.timerText.text = "${state.remainingMinutes} min"
+        lifecycleScope.launch {
+            viewModel.state.collect { state ->
+                binding.coinsText.text = "Coins: ${state.coins}"
+                binding.messageText.text = state.message ?: ""
+            }
         }
 
-        // Session starten
         binding.startSessionButton.setOnClickListener {
-            val task = binding.taskInput.text.toString()
-            val minutes = binding.minutesInput.text.toString().toIntOrNull() ?: 0
+            val task = binding.taskInput.text.toString().ifBlank { "Allgemein" }
+            val minutes = binding.durationInput.text.toString().toIntOrNull() ?: 25
             viewModel.startSession(task, minutes)
         }
 
-        // Session beenden → Kamera öffnen
-        binding.endSessionButton.setOnClickListener {
-            val intent = Intent(this, CameraActivity::class.java)
+        binding.finishSessionButton.setOnClickListener {
+            val intent = Intent(this, com.example.timewallet.camera.CameraActivity::class.java)
             startActivityForResult(intent, 1001)
-        }
-
-        // Social Media kaufen
-        binding.buySocialButton.setOnClickListener {
-            val minutes = binding.buyMinutesInput.text.toString().toIntOrNull() ?: 0
-            viewModel.buySocialTime(minutes)
         }
     }
 
@@ -58,8 +48,8 @@ class MainActivity : ComponentActivity() {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == 1001 && resultCode == RESULT_OK) {
-            val photoPath = data?.getStringExtra("photoPath") ?: return
-            viewModel.finishSession(photoPath)
+            val path = data?.getStringExtra("photoPath") ?: return
+            viewModel.finishSession(path)
         }
     }
 }

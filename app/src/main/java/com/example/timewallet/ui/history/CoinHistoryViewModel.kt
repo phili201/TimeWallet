@@ -8,8 +8,8 @@ import kotlinx.coroutines.flow.stateIn
 
 class CoinHistoryViewModel(app: TimeWalletApp) : ViewModel() {
 
-    private val repo = app.database.coinDao()
+    private val repo = app.repository
 
-    val history = repo.getHistory()
+    val history = repo.getCoinHistory()
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 }

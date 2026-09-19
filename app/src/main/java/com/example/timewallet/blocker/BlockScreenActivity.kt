@@ -1,12 +1,10 @@
-package com.example.timewallet.blocker
+package com.example.timewallet.ui.block
 
-import android.app.Activity
 import android.os.Bundle
+import androidx.activity.ComponentActivity
 import com.example.timewallet.databinding.ActivityBlockScreenBinding
-import androidx.activity.viewModels
-import androidx.lifecycle.observe
 
-class BlockScreenActivity : Activity() {
+class BlockScreenActivity : ComponentActivity() {
 
     private lateinit var binding: ActivityBlockScreenBinding
 
@@ -16,8 +14,7 @@ class BlockScreenActivity : Activity() {
         binding = ActivityBlockScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.backButton.setOnClickListener {
-            finish()
-        }
+        binding.blockCountdown.text = "Zugang blockiert"
+        binding.backButton.setOnClickListener { finish() }
     }
 }

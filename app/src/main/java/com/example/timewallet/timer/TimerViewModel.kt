@@ -3,7 +3,8 @@ package com.example.timewallet.timer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.timewallet.TimeWalletApp
-import com.example.timewallet.data.CoinsRepository
+import com.example.timewallet.data.TimeWalletRepository
+import com.example.timewallet.data.session.SessionEntry
 import com.example.timewallet.ki.SessionVerifier
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,19 +25,12 @@ class TimerViewModel(
     private val app: TimeWalletApp
 ) : ViewModel() {
 
-    private val coinsRepo = CoinsRepository(app.database.coinDao())
+    private val repo: TimeWalletRepository = app.repository
 
     private val _state = MutableStateFlow(TimerState())
     val state: StateFlow<TimerState> = _state
 
     private var timerJob = viewModelScope.launch { }
-
-    fun loadCoins() {
-        viewModelScope.launch {
-            val balance = coinsRepo.getBalance()
-            _state.value = _state.value.copy(coins = balance)
-        }
-    }
 
     fun startSession(task: String, minutes: Int) {
         timerJob.cancel()
@@ -70,13 +64,28 @@ class TimerViewModel(
             val verifier = SessionVerifier()
             val score = verifier.calculateScore(bitmap)
 
+            val minutes = _state.value.sessionMinutes
+
+            val entry = SessionEntry(
+                minutes = minutes,
+                score = score.score,
+                valid = score.score >= 60,
+                timestamp = System.currentTimeMillis()
+            )
+
+            repo.insertSession(entry)
+
             if (score.score >= 60) {
-                val coins = calculateCoins(_state.value.sessionMinutes)
-                coinsRepo.addCoins(coins)
-                val newBalance = coinsRepo.getBalance()
+                val coins = calculateCoins(minutes)
+                repo.insertCoin(
+                    com.example.timewallet.data.coins.CoinEntry(
+                        amount = coins,
+                        reason = "Produktive Session",
+                        timestamp = System.currentTimeMillis()
+                    )
+                )
 
                 _state.value = _state.value.copy(
-                    coins = newBalance,
                     message = "Session bestätigt ✔ Score: ${score.score}"
                 )
             } else {

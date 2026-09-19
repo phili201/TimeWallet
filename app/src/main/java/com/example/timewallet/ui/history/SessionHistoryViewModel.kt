@@ -8,8 +8,8 @@ import kotlinx.coroutines.flow.stateIn
 
 class SessionHistoryViewModel(app: TimeWalletApp) : ViewModel() {
 
-    private val repo = app.database.sessionDao()
+    private val repo = app.repository
 
-    val history = repo.getSessions()
+    val history = repo.getSessionHistory()
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 }
