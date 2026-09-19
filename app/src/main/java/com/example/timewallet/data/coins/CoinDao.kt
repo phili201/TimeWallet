@@ -11,6 +11,6 @@ interface CoinDao {
     @Insert
     suspend fun insert(entry: CoinEntry)
 
-    @Query("SELECT * FROM coin_history ORDER BY timestamp DESC")
+    @Query("SELECT * FROM coins ORDER BY timestamp DESC")
     fun getHistory(): Flow<List<CoinEntry>>
 }

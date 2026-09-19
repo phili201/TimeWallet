@@ -2,7 +2,8 @@ package com.example.timewallet
 
 import android.app.Application
 import androidx.room.Room
-import com.example.timewallet.data.AppDatabase
+import com.example.timewallet.data.TimeWalletRepository
+import com.example.timewallet.data.db.AppDatabase
 
 class TimeWalletApp : Application() {
 
@@ -24,4 +25,3 @@ class TimeWalletApp : Application() {
         )
     }
 }
-
