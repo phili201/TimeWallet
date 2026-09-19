@@ -1,12 +1,6 @@
-// Root build.gradle – darf KEINE Android-Plugins enthalten
-
-plugins {
-    // NICHTS hier eintragen
-}
-
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
+/*
+ Root build.gradle – MUSS leer sein.
+ Keine Plugins.
+ Keine Repositories.
+ Keine Android-Konfiguration.
+*/
