@@ -1,7 +1,14 @@
-<Button xmlns:android="http://schemas.android.com/apk/res/android"
-    android:backgroundTint="#00E5FF"
-    android:textColor="#000000"
-    android:padding="14dp"
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.button.MaterialButton
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/neonButton"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="12dp"/>
+    android:layout_height="48dp"
+    android:text="Start"
+    android:textColor="@color/tesla_text_primary"
+    android:backgroundTint="@color/tesla_dark_gray"
+    app:cornerRadius="16dp"
+    app:strokeWidth="2dp"
+    app:strokeColor="@color/neon_glow"
+    android:elevation="8dp" />
