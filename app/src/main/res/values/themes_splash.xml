@@ -1,6 +1,7 @@
 <resources>
     <style name="Theme.TimeWallet.Splash" parent="Theme.Material3.Dark.NoActionBar">
-        <item name="android:windowBackground">@drawable/splash_background</item>
+        <!-- Use a solid background color for the splash theme to avoid drawable resolution issues at startup -->
+        <item name="android:windowBackground">@color/bg_dark</item>
         <item name="android:windowNoTitle">true</item>
     </style>
 </resources>
