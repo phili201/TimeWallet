@@ -39,7 +39,7 @@
 
         <!-- Block Screen -->
         <activity
-            android:name=".blocker.BlockScreenActivity"
+            android:name=".ui.block.BlockScreenActivity"
             android:exported="false" />
 
         <!-- Accessibility Blocker -->
@@ -55,15 +55,7 @@
                 android:resource="@xml/accessibility_service_config" />
         </service>
 
-        <!-- Boot Receiver -->
-        <receiver
-            android:name=".blocker.BootReceiver"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
+        <!-- Boot Receiver: removed (no implementation present) -->
 
         <!-- FileProvider für Kamera -->
         <provider

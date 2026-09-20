@@ -1,6 +1,5 @@
-plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-    id("com.google.devtools.ksp") version "1.9.22-1.0.17"
-}
+// Top-level build file for project-wide configuration.
+// Module-specific plugins (Android application, Kotlin, KSP) are declared in the module's build.gradle.
+
+// Repository management is controlled in `settings.gradle` via dependencyResolutionManagement.
 
