@@ -10,6 +10,8 @@ import com.example.timewallet.databinding.ActivityMainBinding
 import com.example.timewallet.timer.TimerViewModel
 import com.example.timewallet.timer.TimerViewModelFactory
 import kotlinx.coroutines.launch
+import android.widget.ImageView
+import android.view.View
 
 class MainActivity : ComponentActivity() {
 
@@ -45,6 +47,29 @@ class MainActivity : ComponentActivity() {
         binding.finishSessionButton.setOnClickListener {
             val intent = Intent(this, com.example.timewallet.camera.CameraActivity::class.java)
             startActivityForResult(intent, 1001)
+        }
+
+        // Bottom navigation wiring
+        val navHome = binding.root.findViewById<ImageView>(R.id.navHome)
+        val navStats = binding.root.findViewById<ImageView>(R.id.navStats)
+        val navSettings = binding.root.findViewById<ImageView>(R.id.navSettings)
+        val navLegal = binding.root.findViewById<ImageView>(R.id.navLegal)
+
+        navHome?.setOnClickListener {
+            // Scroll to top or refresh
+            binding.root.scrollTo(0, 0)
+        }
+
+        navStats?.setOnClickListener {
+            startActivity(Intent(this, com.example.timewallet.ui.history.CoinHistoryActivity::class.java))
+        }
+
+        navSettings?.setOnClickListener {
+            startActivity(Intent(this, com.example.timewallet.ui.settings.SettingsActivity::class.java))
+        }
+
+        navLegal?.setOnClickListener {
+            startActivity(Intent(this, com.example.timewallet.ui.legal.LegalActivity::class.java))
         }
     }
 

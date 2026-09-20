@@ -1,59 +1,90 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:padding="24dp"
-    android:background="#0D0D0D"
+    android:background="@color/tesla_black"
+    android:padding="16dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/coinsText"
-        android:text="Coins: 0"
-        android:textSize="24sp"
-        android:textColor="#00E5FF"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-    <TextView
-        android:id="@+id/messageText"
-        android:text=""
-        android:textSize="18sp"
-        android:textColor="#FFFFFF"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingTop="12dp" />
-
-    <EditText
-        android:id="@+id/taskInput"
-        android:hint="Aufgabe"
-        android:textColor="#FFFFFF"
-        android:backgroundTint="#00E5FF"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="16dp" />
+        android:background="@color/tesla_dark_gray"
+        android:padding="16dp"
+        android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/durationInput"
-        android:hint="Minuten"
-        android:inputType="number"
-        android:textColor="#FFFFFF"
-        android:backgroundTint="#00E5FF"
+        <TextView
+            android:id="@+id/coinsText"
+            android:text="Coins: 0"
+            android:textColor="@color/tesla_text_primary"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/messageText"
+            android:layout_marginTop="8dp"
+            android:textColor="@color/tesla_text_secondary"
+            android:textSize="14sp"
+            android:text="" />
+    </LinearLayout>
+
+    <include
+        android:id="@+id/cardPanel"
+        layout="@layout/card_panel" />
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="8dp" />
+        android:orientation="horizontal"
+        android:layout_marginTop="12dp"
+        android:weightSum="2">
 
-    <Button
+        <EditText
+            android:id="@+id/taskInput"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:hint="Aufgabe"
+            android:textColor="@color/tesla_text_primary"
+            android:backgroundTint="@color/tesla_blue"
+            android:padding="12dp" />
+
+        <EditText
+            android:id="@+id/durationInput"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:hint="Minuten"
+            android:inputType="number"
+            android:layout_marginStart="8dp"
+            android:textColor="@color/tesla_text_primary"
+            android:backgroundTint="@color/tesla_blue"
+            android:padding="12dp" />
+    </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/startSessionButton"
-        android:text="Session starten"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="16dp" />
+        android:layout_height="56dp"
+        android:text="Start Session"
+        android:layout_marginTop="12dp"
+        android:textColor="@color/tesla_text_primary"
+        app:cornerRadius="12dp"
+        android:backgroundTint="@color/tesla_blue" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/finishSessionButton"
-        android:text="Session abschließen"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="8dp" />
+        android:layout_height="56dp"
+        android:text="Foto (Session beenden)"
+        android:layout_marginTop="8dp"
+        android:textColor="@color/tesla_text_primary"
+        app:cornerRadius="12dp"
+        android:backgroundTint="@color/tesla_cyan" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <include layout="@layout/bottom_nav" />
 
 </LinearLayout>
