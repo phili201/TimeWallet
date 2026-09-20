@@ -7,6 +7,7 @@ import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.timewallet.TimeWalletApp
 import com.example.timewallet.databinding.ActivityMainBinding
+import com.example.timewallet.R
 import com.example.timewallet.timer.TimerViewModel
 import com.example.timewallet.timer.TimerViewModelFactory
 import kotlinx.coroutines.launch
