@@ -50,27 +50,29 @@ class MainActivity : ComponentActivity() {
             startActivityForResult(intent, 1001)
         }
 
-        // Bottom navigation wiring
-        val navHome = binding.root.findViewById<ImageView>(R.id.navHome)
-        val navStats = binding.root.findViewById<ImageView>(R.id.navStats)
-        val navSettings = binding.root.findViewById<ImageView>(R.id.navSettings)
-        val navLegal = binding.root.findViewById<ImageView>(R.id.navLegal)
+        // Bottom navigation wiring (use explicit include id)
+        val bottomNav = binding.root.findViewById<View>(R.id.bottomNav)
+        if (bottomNav != null) {
+            val navHome = bottomNav.findViewById<ImageView>(R.id.navHome)
+            val navStats = bottomNav.findViewById<ImageView>(R.id.navStats)
+            val navSettings = bottomNav.findViewById<ImageView>(R.id.navSettings)
+            val navLegal = bottomNav.findViewById<ImageView>(R.id.navLegal)
 
-        navHome?.setOnClickListener {
-            // Scroll to top or refresh
-            binding.root.scrollTo(0, 0)
-        }
+            navHome?.setOnClickListener {
+                binding.root.scrollTo(0, 0)
+            }
 
-        navStats?.setOnClickListener {
-            startActivity(Intent(this, com.example.timewallet.ui.history.CoinHistoryActivity::class.java))
-        }
+            navStats?.setOnClickListener {
+                startActivity(Intent(this, com.example.timewallet.ui.history.CoinHistoryActivity::class.java))
+            }
 
-        navSettings?.setOnClickListener {
-            startActivity(Intent(this, com.example.timewallet.ui.settings.SettingsActivity::class.java))
-        }
+            navSettings?.setOnClickListener {
+                startActivity(Intent(this, com.example.timewallet.ui.settings.SettingsActivity::class.java))
+            }
 
-        navLegal?.setOnClickListener {
-            startActivity(Intent(this, com.example.timewallet.ui.legal.LegalActivity::class.java))
+            navLegal?.setOnClickListener {
+                startActivity(Intent(this, com.example.timewallet.ui.legal.LegalActivity::class.java))
+            }
         }
     }
 
