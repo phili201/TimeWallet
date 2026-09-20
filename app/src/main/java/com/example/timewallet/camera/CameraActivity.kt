@@ -1,9 +1,9 @@
 package com.example.timewallet.camera
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import androidx.activity.ComponentActivity
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
@@ -14,7 +14,7 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class CameraActivity : Activity() {
+class CameraActivity : ComponentActivity() {
 
     private lateinit var binding: ActivityCameraBinding
     private var imageCapture: ImageCapture? = null
@@ -22,7 +22,6 @@ class CameraActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Tesla Dark Bars
         window.navigationBarColor = 0xFF0D0D0D.toInt()
         window.statusBarColor = 0xFF0D0D0D.toInt()
 
@@ -52,7 +51,7 @@ class CameraActivity : Activity() {
 
             cameraProvider.unbindAll()
             cameraProvider.bindToLifecycle(
-                this,
+                this,            // FIX: ComponentActivity = LifecycleOwner
                 cameraSelector,
                 preview,
                 imageCapture
