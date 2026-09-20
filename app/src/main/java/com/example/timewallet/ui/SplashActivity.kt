@@ -2,26 +2,33 @@ package com.example.timewallet.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.animation.AnimationUtils
+import android.widget.ImageView
 import androidx.activity.ComponentActivity
-import com.example.timewallet.databinding.ActivitySplashBinding
-import androidx.activity.viewModels
-import androidx.lifecycle.observe
+import androidx.lifecycle.lifecycleScope
+import com.example.timewallet.R
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class SplashActivity : ComponentActivity() {
-
-    private lateinit var binding: ActivitySplashBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivitySplashBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        window.navigationBarColor = 0xFF0D0D0D.toInt()
+        window.statusBarColor = 0xFF0D0D0D.toInt()
 
-        // 1 Sekunde warten → dann MainActivity starten
-        binding.root.postDelayed({
-            startActivity(Intent(this, MainActivity::class.java))
+        setContentView(R.layout.activity_splash)
+
+        val logo = findViewById<ImageView>(R.id.logo)
+
+        logo.startAnimation(AnimationUtils.loadAnimation(this, R.anim.fade_in))
+        logo.startAnimation(AnimationUtils.loadAnimation(this, R.anim.scale_up))
+
+        lifecycleScope.launch {
+            delay(1200)
+            startActivity(Intent(this@SplashActivity, MainActivity::class.java))
             finish()
-        }, 1000)
+        }
     }
 }
-

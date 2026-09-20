@@ -2,13 +2,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:padding="24dp"
+    android:background="#0D0D0D"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <TextView
         android:id="@+id/coinsText"
         android:text="Coins: 0"
-        android:textSize="22sp"
+        android:textSize="24sp"
+        android:textColor="#00E5FF"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
@@ -16,6 +18,7 @@
         android:id="@+id/messageText"
         android:text=""
         android:textSize="18sp"
+        android:textColor="#FFFFFF"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingTop="12dp" />
@@ -23,6 +26,8 @@
     <EditText
         android:id="@+id/taskInput"
         android:hint="Aufgabe"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#00E5FF"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="16dp" />
@@ -31,6 +36,8 @@
         android:id="@+id/durationInput"
         android:hint="Minuten"
         android:inputType="number"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#00E5FF"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="8dp" />
@@ -50,4 +57,3 @@
         android:paddingTop="8dp" />
 
 </LinearLayout>
-

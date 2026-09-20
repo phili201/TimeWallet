@@ -2,9 +2,11 @@ package com.example.timewallet.ui.history
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import androidx.recyclerview.widget.RecyclerView
 import com.example.timewallet.data.session.SessionEntry
 import com.example.timewallet.databinding.ItemSessionHistoryBinding
+import com.example.timewallet.R
 
 class SessionHistoryAdapter :
     RecyclerView.Adapter<SessionHistoryAdapter.ViewHolder>() {
@@ -32,9 +34,13 @@ class SessionHistoryAdapter :
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val entry = items[position]
-        holder.binding.minutesText.text = "${entry.minutes} min"
+        holder.binding.minutesText.text = "${entry.minutes} Minuten"
         holder.binding.scoreText.text = "Score: ${entry.score}"
-        holder.binding.validText.text = if (entry.valid) "✔ gültig" else "❌ ungültig"
+        holder.binding.validText.text = if (entry.valid) "✔" else "❌"
         holder.binding.timeText.text = entry.timestamp.toString()
+
+        holder.itemView.startAnimation(
+            AnimationUtils.loadAnimation(holder.itemView.context, R.anim.item_fade_in)
+        )
     }
 }

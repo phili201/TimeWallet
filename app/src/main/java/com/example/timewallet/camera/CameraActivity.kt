@@ -8,7 +8,6 @@ import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import com.example.timewallet.databinding.ActivityCameraBinding
 import java.io.File
@@ -22,6 +21,10 @@ class CameraActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Tesla Dark Bars
+        window.navigationBarColor = 0xFF0D0D0D.toInt()
+        window.statusBarColor = 0xFF0D0D0D.toInt()
 
         binding = ActivityCameraBinding.inflate(layoutInflater)
         setContentView(binding.root)

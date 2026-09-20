@@ -3,8 +3,6 @@ package com.example.timewallet.ui.legal
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import com.example.timewallet.databinding.ActivityLegalViewerBinding
-import androidx.activity.viewModels
-import androidx.lifecycle.observe
 
 class LegalViewerActivity : ComponentActivity() {
 
@@ -12,19 +10,19 @@ class LegalViewerActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        window.navigationBarColor = 0xFF0D0D0D.toInt()
+        window.statusBarColor = 0xFF0D0D0D.toInt()
+
         binding = ActivityLegalViewerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val fileName = intent.getStringExtra("file") ?: ""
         val title = intent.getStringExtra("title") ?: ""
+        val content = intent.getStringExtra("content") ?: ""
 
-        binding.legalTitle.text = title
+        binding.titleText.text = title
+        binding.contentText.text = content
 
-        val text = assets.open("legal/$fileName").bufferedReader().use { it.readText() }
-        binding.legalText.text = text
-
-        binding.backButton.setOnClickListener {
-            finish()
-        }
+        binding.backButton.setOnClickListener { finish() }
     }
 }

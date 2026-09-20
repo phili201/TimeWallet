@@ -5,7 +5,7 @@ import android.accessibilityservice.AccessibilityServiceInfo
 import android.content.Intent
 import android.view.accessibility.AccessibilityEvent
 import com.example.timewallet.TimeWalletApp
-import com.example.timewallet.blocker.BlockScreenActivity
+import com.example.timewallet.ui.block.BlockScreenActivity
 
 class SocialBlockerService : AccessibilityService() {
 

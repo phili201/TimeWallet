@@ -2,12 +2,7 @@ package com.example.timewallet.ui.block
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.lifecycle.lifecycleScope
-import com.example.timewallet.TimeWalletApp
 import com.example.timewallet.databinding.ActivityBlockScreenBinding
-import kotlinx.coroutines.launch
-import androidx.activity.viewModels
-import androidx.lifecycle.observe
 
 class BlockScreenActivity : ComponentActivity() {
 
@@ -15,15 +10,15 @@ class BlockScreenActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Tesla Dark Bars
+        window.navigationBarColor = 0xFF0D0D0D.toInt()
+        window.statusBarColor = 0xFF0D0D0D.toInt()
+
         binding = ActivityBlockScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val repo = (application as TimeWalletApp).repository
-
-        lifecycleScope.launch {
-            repo.socialMinutesFlow.collect { m ->
-                binding.blockCountdown.text = "Noch $m Minuten"
-            }
-        }
+        binding.blockCountdown.text = "Zugang blockiert"
+        binding.backButton.setOnClickListener { finish() }
     }
 }

@@ -4,8 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import com.example.timewallet.databinding.ActivityLegalBinding
-import androidx.activity.viewModels
-import androidx.lifecycle.observe
 
 class LegalActivity : ComponentActivity() {
 
@@ -13,30 +11,27 @@ class LegalActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        window.navigationBarColor = 0xFF0D0D0D.toInt()
+        window.statusBarColor = 0xFF0D0D0D.toInt()
+
         binding = ActivityLegalBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.btnHaftung.setOnClickListener {
-            openDoc("haftungsausschluss.txt", "Haftungsausschluss")
+        binding.privacyButton.setOnClickListener {
+            startActivity(Intent(this, LegalViewerActivity::class.java).apply {
+                putExtra("title", "Datenschutz")
+                putExtra("content", "Hier stehen deine Datenschutzinformationen…")
+            })
         }
 
-        binding.btnNutzung.setOnClickListener {
-            openDoc("nutzungsbedingungen.txt", "Nutzungsbedingungen")
+        binding.imprintButton.setOnClickListener {
+            startActivity(Intent(this, LegalViewerActivity::class.java).apply {
+                putExtra("title", "Impressum")
+                putExtra("content", "Hier steht dein Impressum…")
+            })
         }
 
-        binding.btnDatenschutz.setOnClickListener {
-            openDoc("datenschutz.txt", "Datenschutzerklärung")
-        }
-
-        binding.btnLizenz.setOnClickListener {
-            openDoc("LICENSE", "Lizenz")
-        }
-    }
-
-    private fun openDoc(file: String, title: String) {
-        val intent = Intent(this, LegalViewerActivity::class.java)
-        intent.putExtra("file", file)
-        intent.putExtra("title", title)
-        startActivity(intent)
+        binding.backButton.setOnClickListener { finish() }
     }
 }

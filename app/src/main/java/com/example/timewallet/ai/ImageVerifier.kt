@@ -1,10 +1,10 @@
 package com.example.timewallet.ai
 
 import android.graphics.BitmapFactory
+import com.example.timewallet.ki.await
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.label.ImageLabeling
 import com.google.mlkit.vision.label.defaults.ImageLabelerOptions
-import kotlinx.coroutines.tasks.await
 
 class ImageVerifier {
 
@@ -26,3 +26,4 @@ class ImageVerifier {
         return labels.any { productiveLabels.contains(it.text) }
     }
 }
+

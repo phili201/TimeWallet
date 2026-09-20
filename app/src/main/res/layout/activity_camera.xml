@@ -1,18 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="#0D0D0D"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <androidx.camera.view.PreviewView
         android:id="@+id/cameraPreview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
 
     <Button
         android:id="@+id/captureButton"
         android:text="Foto aufnehmen"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:layout_gravity="center|bottom"
-        android:layout_marginBottom="32dp"/>
+        android:layout_marginBottom="32dp"
+        android:layout_width="200dp"
+        android:layout_height="60dp"
+        android:backgroundTint="#00E5FF"
+        android:textColor="#000000"
+        android:textSize="18sp" />
+
 </FrameLayout>
+

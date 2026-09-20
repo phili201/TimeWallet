@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.timewallet.TimeWalletApp
 import com.example.timewallet.data.TimeWalletRepository
 import com.example.timewallet.data.session.SessionEntry
+import com.example.timewallet.data.coins.CoinEntry
 import com.example.timewallet.ki.SessionVerifier
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -66,24 +67,22 @@ class TimerViewModel(
 
             val minutes = _state.value.sessionMinutes
 
-            val entry = SessionEntry(
+            val sessionEntry = SessionEntry(
                 minutes = minutes,
                 score = score.score,
                 valid = score.score >= 60,
                 timestamp = System.currentTimeMillis()
             )
-
-            repo.insertSession(entry)
+            repo.insertSession(sessionEntry)
 
             if (score.score >= 60) {
                 val coins = calculateCoins(minutes)
-                repo.insertCoin(
-                    com.example.timewallet.data.coins.CoinEntry(
-                        amount = coins,
-                        reason = "Produktive Session",
-                        timestamp = System.currentTimeMillis()
-                    )
+                val coinEntry = CoinEntry(
+                    amount = coins,
+                    reason = "Produktive Session",
+                    timestamp = System.currentTimeMillis()
                 )
+                repo.insertCoin(coinEntry)
 
                 _state.value = _state.value.copy(
                     message = "Session bestätigt ✔ Score: ${score.score}"

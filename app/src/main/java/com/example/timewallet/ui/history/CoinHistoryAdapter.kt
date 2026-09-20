@@ -2,9 +2,11 @@ package com.example.timewallet.ui.history
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import androidx.recyclerview.widget.RecyclerView
 import com.example.timewallet.data.coins.CoinEntry
 import com.example.timewallet.databinding.ItemCoinHistoryBinding
+import com.example.timewallet.R
 
 class CoinHistoryAdapter :
     RecyclerView.Adapter<CoinHistoryAdapter.ViewHolder>() {
@@ -35,5 +37,9 @@ class CoinHistoryAdapter :
         holder.binding.amountText.text = "${entry.amount} Coins"
         holder.binding.reasonText.text = entry.reason
         holder.binding.timeText.text = entry.timestamp.toString()
+
+        holder.itemView.startAnimation(
+            AnimationUtils.loadAnimation(holder.itemView.context, R.anim.item_fade_in)
+        )
     }
 }

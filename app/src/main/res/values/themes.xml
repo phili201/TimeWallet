@@ -1,9 +1,30 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
     <style name="Theme.TimeWallet" parent="Theme.Material3.Dark.NoActionBar">
+        <!-- Tesla Black -->
+        <item name="android:colorBackground">#0D0D0D</item>
+        <item name="colorSurface">#0D0D0D</item>
+        <item name="colorOnSurface">#FFFFFF</item>
+
+        <!-- Neon Cyan Akzent -->
         <item name="colorPrimary">#00E5FF</item>
-        <item name="colorSecondary">#00B8D4</item>
-        <item name="android:statusBarColor">#000000</item>
-        <item name="android:navigationBarColor">#000000</item>
-        <item name="android:windowBackground">#0D0D0D</item>
+        <item name="colorSecondary">#00E5FF</item>
+        <item name="colorTertiary">#00E5FF</item>
+
+        <!-- Buttons -->
+        <item name="android:buttonStyle">@style/TeslaButton</item>
+
+        <!-- Text -->
+        <item name="android:textColor">#FFFFFF</item>
+
+        <!-- Tesla Ripple -->
+        <item name="android:colorControlHighlight">@drawable/ripple</item>
     </style>
+
+    <style name="TeslaButton" parent="Widget.Material3.Button">
+        <item name="android:backgroundTint">#00E5FF</item>
+        <item name="android:textColor">#000000</item>
+    </style>
+
 </resources>
+

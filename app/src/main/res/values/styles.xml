@@ -1,0 +1,8 @@
+<resources>
+
+    <style name="TeslaNavigationBar">
+        <item name="android:navigationBarColor">#0D0D0D</item>
+        <item name="android:statusBarColor">#0D0D0D</item>
+    </style>
+
+</resources>

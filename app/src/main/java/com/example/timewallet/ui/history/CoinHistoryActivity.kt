@@ -19,6 +19,9 @@ class CoinHistoryActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        window.navigationBarColor = 0xFF0D0D0D.toInt()
+        window.statusBarColor = 0xFF0D0D0D.toInt()
+
         binding = ActivityCoinHistoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
