@@ -13,28 +13,4 @@
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:padding="8dp"/>
-
-    <ImageView
-        android:id="@+id/navStats"
-        android:src="@drawable/ic_stats"
-        android:tint="#B3B3B3"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:padding="8dp"/>
-
-    <ImageView
-        android:id="@+id/navSettings"
-        android:src="@drawable/ic_settings"
-        android:tint="#B3B3B3"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:padding="8dp"/>
-
-    <ImageView
-        android:id="@+id/navLegal"
-        android:src="@drawable/ic_shield"
-        android:tint="#B3B3B3"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:padding="8dp"/>
 </LinearLayout>
