@@ -30,22 +30,24 @@ class TimeWalletRepository(
     fun isProductivitySessionRunning(): Boolean = socialStore.isProductivitySessionRunning()
     fun getSocialRemainingMinutes(): Int = socialStore.remainingMinutes()
 
+    fun startSocialUse() = socialStore.startSocialUse()
+    fun stopSocialUse() = socialStore.stopSocialUse()
+
     fun isEmergencySwitchEnabled(): Boolean = emergencyStore.isEnabled()
     fun setEmergencySwitchEnabled(enabled: Boolean) = emergencyStore.setEnabled(enabled)
 
     fun isSocialAllowed(): Boolean {
         if (emergencyStore.isEnabled()) return true
-        socialStore.consumeExpired()
         if (socialStore.isProductivitySessionRunning()) return false
-        return socialStore.purchasedUntil() > System.currentTimeMillis()
+        return socialStore.purchasedRemainingMs() > 0L
     }
 
     suspend fun purchaseSocialTime(minutes: Int, coinCost: Int): Boolean {
         if (minutes <= 0 || coinCost <= 0) return false
         if (coinDao.getBalanceOnce() < coinCost) return false
         if (socialStore.isAntiAddictionMode() && minutes > 30) return false
+        if (!socialStore.purchaseMinutes(minutes)) return false
         coinDao.insert(CoinEntry(amount = -coinCost, reason = "Social-Zeit gekauft", timestamp = System.currentTimeMillis()))
-        socialStore.purchaseMinutes(minutes)
         return true
     }
 
