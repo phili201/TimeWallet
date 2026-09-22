@@ -1,95 +1,124 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:background="@color/tesla_black"
-    android:padding="16dp"
+    android:fillViewport="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/tesla_dark_gray"
+        android:orientation="vertical"
         android:padding="16dp"
-        android:orientation="vertical">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:text="TIMEWALLET"
+            android:textColor="@color/tesla_text_primary"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
         <TextView
             android:id="@+id/coinsText"
             android:text="Coins: 0"
-            android:textColor="@color/tesla_text_primary"
-            android:textSize="18sp" />
+            android:textColor="@color/tesla_blue"
+            android:textSize="22sp"
+            android:layout_marginTop="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/socialTimeText"
+            android:text="Social-Zeit: 0 Min"
+            android:textColor="@color/tesla_text_secondary"
+            android:textSize="16sp"
+            android:layout_marginTop="4dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/sessionTimeText"
+            android:text="Keine aktive Session"
+            android:textColor="@color/tesla_text_secondary"
+            android:textSize="16sp"
+            android:layout_marginTop="4dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
         <TextView
             android:id="@+id/messageText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:textColor="@color/tesla_text_secondary"
             android:textSize="14sp"
-            android:text="" />
-    </LinearLayout>
+            android:layout_marginTop="12dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
-    <include
-        android:id="@+id/cardPanel"
-        layout="@layout/card_panel" />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp"
+            android:weightSum="2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="12dp"
-        android:weightSum="2">
+            <EditText
+                android:id="@+id/taskInput"
+                android:hint="Aufgabe"
+                android:textColor="@color/tesla_text_primary"
+                android:textColorHint="@color/tesla_text_secondary"
+                android:backgroundTint="@color/tesla_blue"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content" />
 
-        <EditText
-            android:id="@+id/taskInput"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:hint="Aufgabe"
+            <EditText
+                android:id="@+id/durationInput"
+                android:hint="Minuten"
+                android:inputType="number"
+                android:textColor="@color/tesla_text_primary"
+                android:textColorHint="@color/tesla_text_secondary"
+                android:backgroundTint="@color/tesla_blue"
+                android:layout_marginStart="8dp"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/startSessionButton"
+            android:text="Produktive Session starten"
+            android:layout_marginTop="12dp"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            app:cornerRadius="12dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/finishSessionButton"
+            android:text="Session mit Foto bestätigen"
+            android:layout_marginTop="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            app:cornerRadius="12dp" />
+
+        <TextView
+            android:text="Social Media"
             android:textColor="@color/tesla_text_primary"
-            android:backgroundTint="@color/tesla_blue"
-            android:padding="12dp" />
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginTop="24dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
-        <EditText
-            android:id="@+id/durationInput"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:hint="Minuten"
-            android:inputType="number"
-            android:layout_marginStart="8dp"
-            android:textColor="@color/tesla_text_primary"
-            android:backgroundTint="@color/tesla_blue"
-            android:padding="12dp" />
+        <TextView
+            android:text="Instagram  •  YouTube  •  während Sessions blockiert"
+            android:textColor="@color/tesla_text_secondary"
+            android:layout_marginTop="6dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <include
+            android:id="@+id/bottomNav"
+            layout="@layout/bottom_nav"
+            android:layout_marginTop="24dp" />
     </LinearLayout>
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/startSessionButton"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:text="Start Session"
-        android:layout_marginTop="12dp"
-        android:textColor="@color/tesla_text_primary"
-        app:cornerRadius="12dp"
-        android:backgroundTint="@color/tesla_blue" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/finishSessionButton"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:text="Foto (Session beenden)"
-        android:layout_marginTop="8dp"
-        android:textColor="@color/tesla_text_primary"
-        app:cornerRadius="12dp"
-        android:backgroundTint="@color/tesla_cyan" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-
-    <include
-        android:id="@+id/bottomNav"
-        layout="@layout/bottom_nav" />
-
-</LinearLayout>
+</ScrollView>
