@@ -5,37 +5,36 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
+import com.example.timewallet.R
 import com.example.timewallet.TimeWalletApp
 import com.example.timewallet.databinding.ActivityMainBinding
-import com.example.timewallet.R
 import com.example.timewallet.timer.TimerViewModel
 import com.example.timewallet.timer.TimerViewModelFactory
 import kotlinx.coroutines.launch
-import android.widget.ImageView
-import android.view.View
 
 class MainActivity : ComponentActivity() {
-
     private lateinit var binding: ActivityMainBinding
-
-    private val viewModel: TimerViewModel by viewModels {
-        TimerViewModelFactory(application as TimeWalletApp)
-    }
+    private val viewModel: TimerViewModel by viewModels { TimerViewModelFactory(application as TimeWalletApp) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Tesla Dark Bars
         window.navigationBarColor = 0xFF0D0D0D.toInt()
         window.statusBarColor = 0xFF0D0D0D.toInt()
-
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         lifecycleScope.launch {
             viewModel.state.collect { state ->
-                binding.coinsText.text = "Coins: ${state.coins}"
+                binding.coinsText.text = "🪙 ${state.coins} Coins"
+                binding.socialTimeText.text = "Social-Zeit: ${state.socialRemainingMinutes} Min"
+                binding.sessionTimeText.text = if (state.isRunning) {
+                    "${state.currentTask}: ${state.remainingMinutes} Min verbleiben"
+                } else if (state.sessionMinutes > 0) {
+                    "Letzte Session: ${state.sessionMinutes} Min"
+                } else "Keine aktive Session"
                 binding.messageText.text = state.message ?: ""
+                binding.startSessionButton.isEnabled = !state.isRunning
+                binding.finishSessionButton.isEnabled = !state.isRunning && state.sessionMinutes > 0
             }
         }
 
@@ -46,42 +45,29 @@ class MainActivity : ComponentActivity() {
         }
 
         binding.finishSessionButton.setOnClickListener {
-            val intent = Intent(this, com.example.timewallet.camera.CameraActivity::class.java)
-            startActivityForResult(intent, 1001)
+            startActivityForResult(Intent(this, com.example.timewallet.camera.CameraActivity::class.java), REQUEST_PHOTO)
         }
 
-        // Bottom navigation wiring (use explicit include id)
-        val bottomNav = binding.root.findViewById<View>(R.id.bottomNav)
-        if (bottomNav != null) {
-            val navHome = bottomNav.findViewById<ImageView>(R.id.navHome)
-            val navStats = bottomNav.findViewById<ImageView>(R.id.navStats)
-            val navSettings = bottomNav.findViewById<ImageView>(R.id.navSettings)
-            val navLegal = bottomNav.findViewById<ImageView>(R.id.navLegal)
-
-            navHome?.setOnClickListener {
-                binding.root.scrollTo(0, 0)
-            }
-
-            navStats?.setOnClickListener {
-                startActivity(Intent(this, com.example.timewallet.ui.history.CoinHistoryActivity::class.java))
-            }
-
-            navSettings?.setOnClickListener {
-                startActivity(Intent(this, com.example.timewallet.ui.settings.SettingsActivity::class.java))
-            }
-
-            navLegal?.setOnClickListener {
-                startActivity(Intent(this, com.example.timewallet.ui.legal.LegalActivity::class.java))
-            }
+        val bottomNav = binding.bottomNav.root
+        bottomNav.findViewById<android.view.View>(R.id.navHome)?.setOnClickListener { binding.root.scrollTo(0, 0) }
+        bottomNav.findViewById<android.view.View>(R.id.navStats)?.setOnClickListener {
+            startActivity(Intent(this, com.example.timewallet.ui.history.CoinHistoryActivity::class.java))
+        }
+        bottomNav.findViewById<android.view.View>(R.id.navSettings)?.setOnClickListener {
+            startActivity(Intent(this, com.example.timewallet.ui.settings.SettingsActivity::class.java))
+        }
+        bottomNav.findViewById<android.view.View>(R.id.navLegal)?.setOnClickListener {
+            startActivity(Intent(this, com.example.timewallet.ui.legal.LegalActivity::class.java))
         }
     }
 
+    @Deprecated("Use Activity Result APIs for new code")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == 1001 && resultCode == RESULT_OK) {
-            val path = data?.getStringExtra("photoPath") ?: return
-            viewModel.finishSession(path)
+        if (requestCode == REQUEST_PHOTO && resultCode == RESULT_OK) {
+            data?.getStringExtra("photoPath")?.let(viewModel::finishSession)
         }
     }
+
+    companion object { private const val REQUEST_PHOTO = 1001 }
 }
