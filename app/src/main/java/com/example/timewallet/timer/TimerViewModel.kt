@@ -69,7 +69,11 @@ class TimerViewModel(private val app: TimeWalletApp) : ViewModel() {
     }
 
     fun finishSession(photoPath: String) {
-        if (_state.value.sessionMinutes <= 0) return
+        val current = _state.value
+        if (current.sessionMinutes <= 0 || current.isRunning) {
+            _state.value = current.copy(message = "Bitte erst die laufende Session vollständig beenden.")
+            return
+        }
         timerJob.cancel()
         viewModelScope.launch {
             val bitmap = BitmapFactory.decodeFile(photoPath)
@@ -80,28 +84,18 @@ class TimerViewModel(private val app: TimeWalletApp) : ViewModel() {
             val result = SessionVerifier().calculateScore(bitmap)
             val minutes = _state.value.sessionMinutes
             val valid = result.score >= 60
-            repo.insertSession(
-                SessionEntry(minutes, result.score, valid, System.currentTimeMillis())
-            )
+            repo.insertSession(SessionEntry(minutes, result.score, valid, System.currentTimeMillis(), _state.value.currentTask))
             if (valid) {
                 val coins = calculateCoins(minutes)
-                repo.insertCoin(CoinEntry(coins, "Produktive Session", System.currentTimeMillis()))
-                _state.value = _state.value.copy(
-                    isRunning = false,
-                    remainingMinutes = 0,
-                    message = "Session bestätigt ✔ +$coins Coins • Score: ${result.score}"
-                )
+                repo.insertCoin(CoinEntry(coins, "Produktive Session: ${_state.value.currentTask}", System.currentTimeMillis()))
+                _state.value = _state.value.copy(isRunning = false, remainingMinutes = 0, message = "Session bestätigt ✔ +$coins Coins • Score: ${result.score}")
             } else {
-                _state.value = _state.value.copy(
-                    isRunning = false,
-                    message = "Session abgelehnt ❌ Score: ${result.score} (${result.reason})"
-                )
+                _state.value = _state.value.copy(isRunning = false, message = "Session abgelehnt ❌ Score: ${result.score} (${result.reason})")
             }
         }
     }
 
-    private fun calculateCoins(minutes: Int): Int =
-        minutes + if (minutes >= 60) 10 else if (minutes >= 30) 5 else 0
+    private fun calculateCoins(minutes: Int): Int = minutes + if (minutes >= 60) 10 else if (minutes >= 30) 5 else 0
 
     override fun onCleared() {
         timerJob.cancel()
