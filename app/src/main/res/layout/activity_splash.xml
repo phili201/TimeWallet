@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#0D0D0D"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -10,7 +11,6 @@
         android:layout_gravity="center"
         android:layout_width="200dp"
         android:layout_height="200dp"
-        android:tint="#00E5FF" />
+        app:tint="#00E5FF" />
 
 </FrameLayout>
-
