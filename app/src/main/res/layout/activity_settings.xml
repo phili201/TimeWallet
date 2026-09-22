@@ -10,7 +10,7 @@
                 <com.google.android.material.button.MaterialButton android:id="@+id/saveButton" android:text="Profil speichern" app:cornerRadius="16dp" android:layout_marginTop="10dp" android:layout_width="match_parent" android:layout_height="52dp" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
-        <TextView android:text="Sicherheit & Fokus" android:textColor="@color/tesla_text_primary" android:textSize="20sp" android:textStyle="bold" android:layout_marginTop="24dp" android:layout_width="match_parent" android:layout_height="wrap_content" />
+        <TextView android:text="Sicherheit &amp; Fokus" android:textColor="@color/tesla_text_primary" android:textSize="20sp" android:textStyle="bold" android:layout_marginTop="24dp" android:layout_width="match_parent" android:layout_height="wrap_content" />
         <com.google.android.material.card.MaterialCardView app:cardBackgroundColor="@color/tesla_surface" app:cardCornerRadius="22dp" android:layout_marginTop="10dp" android:layout_width="match_parent" android:layout_height="wrap_content">
             <LinearLayout android:orientation="vertical" android:padding="8dp" android:layout_width="match_parent" android:layout_height="wrap_content">
                 <com.google.android.material.switchmaterial.SwitchMaterial android:id="@+id/antiAddictionSwitch" android:text="Anti-Sucht-Modus" android:textColor="@color/tesla_text_primary" android:textSize="16sp" android:padding="10dp" android:layout_width="match_parent" android:layout_height="wrap_content" />
@@ -19,6 +19,6 @@
                 <TextView android:text="Schaltet den Blocker als Wiederherstellungsfunktion aus." android:textColor="@color/tesla_text_secondary" android:textSize="13sp" android:paddingStart="18dp" android:paddingEnd="18dp" android:paddingBottom="10dp" android:layout_width="match_parent" android:layout_height="wrap_content" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
-        <com.google.android.material.button.MaterialButton android:id="@+id/legalButton" android:text="Datenschutz & Rechtliches" app:cornerRadius="16dp" android:layout_marginTop="16dp" android:layout_width="match_parent" android:layout_height="52dp" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/legalButton" android:text="Datenschutz &amp; Rechtliches" app:cornerRadius="16dp" android:layout_marginTop="16dp" android:layout_width="match_parent" android:layout_height="52dp" />
     </LinearLayout>
 </ScrollView>
