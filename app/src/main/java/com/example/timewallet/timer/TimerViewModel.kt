@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 
 data class TimerState(
     val coins: Int = 0,
-    val socialMinutes: Int = 0,
+    val socialRemainingMinutes: Int = 0,
     val message: String? = null,
     val isRunning: Boolean = false,
     val remainingMinutes: Int = 0,
@@ -34,7 +34,7 @@ class TimerViewModel(private val app: TimeWalletApp) : ViewModel() {
         viewModelScope.launch { repo.getCoinBalance().collect { balance -> _state.value = _state.value.copy(coins = balance) } }
         viewModelScope.launch {
             while (true) {
-                _state.value = _state.value.copy(socialMinutes = repo.getSocialRemainingMinutes())
+                _state.value = _state.value.copy(socialRemainingMinutes = repo.getSocialRemainingMinutes())
                 delay(1_000)
             }
         }
