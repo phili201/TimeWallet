@@ -3,6 +3,7 @@ package com.example.timewallet.data
 import android.content.Context
 import com.example.timewallet.data.coins.CoinDao
 import com.example.timewallet.data.coins.CoinEntry
+import com.example.timewallet.data.emergency.EmergencySwitchStore
 import com.example.timewallet.data.session.SessionDao
 import com.example.timewallet.data.session.SessionEntry
 import com.example.timewallet.data.social.SocialAccessStore
@@ -14,6 +15,7 @@ class TimeWalletRepository(
     private val sessionDao: SessionDao
 ) {
     private val socialStore = SocialAccessStore(context.applicationContext)
+    private val emergencyStore = EmergencySwitchStore(context.applicationContext)
 
     fun getCoinHistory(): Flow<List<CoinEntry>> = coinDao.getHistory()
     fun getCoinBalance(): Flow<Int> = coinDao.getBalance()
@@ -27,7 +29,11 @@ class TimeWalletRepository(
     fun isProductivitySessionRunning(): Boolean = socialStore.isProductivitySessionRunning()
     fun getSocialRemainingMinutes(): Int = socialStore.remainingMinutes()
 
+    fun isEmergencySwitchEnabled(): Boolean = emergencyStore.isEnabled()
+    fun setEmergencySwitchEnabled(enabled: Boolean) = emergencyStore.setEnabled(enabled)
+
     fun isSocialAllowed(): Boolean {
+        if (emergencyStore.isEnabled()) return true
         socialStore.consumeExpired()
         if (socialStore.isProductivitySessionRunning()) return false
         return socialStore.purchasedUntil() > System.currentTimeMillis()
