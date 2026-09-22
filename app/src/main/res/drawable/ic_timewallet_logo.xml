@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="200dp"
-    android:height="200dp"
-    android:viewportWidth="200"
-    android:viewportHeight="200">
-
-    <!-- Tesla‑Style Minimal Logo -->
-    <path
-        android:fillColor="#00E5FF"
-        android:pathData="M100,20 L120,80 L100,70 L80,80 Z" />
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="200dp" android:height="200dp" android:viewportWidth="200" android:viewportHeight="200">
+    <path android:fillColor="#00E5FF" android:pathData="M100,8A92,92 0,1 0,100 192A92,92 0,1 0,100 8M100,28A72,72 0,1 1,100 172A72,72 0,1 1,100 28" />
+    <path android:fillColor="#F5F7FA" android:pathData="M92,48h16v52l38,22 -8,14 -46,-28z" />
+    <path android:fillColor="#00E5FF" android:pathData="M63,56h74v14H63z" />
+    <path android:fillColor="#00E5FF" android:pathData="M94,58h12v54H94z" />
+    <path android:fillColor="#00E5FF" android:pathData="M55,118h90v14H55z" />
 </vector>
