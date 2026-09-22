@@ -2,41 +2,59 @@ package com.example.timewallet.data.social
 
 import android.content.Context
 
+/** Persists purchased social minutes and tracks only foreground use of target apps. */
 class SocialAccessStore(context: Context) {
     private val prefs = context.getSharedPreferences("social_access", Context.MODE_PRIVATE)
 
-    fun purchasedUntil(): Long = prefs.getLong(KEY_UNTIL, 0L)
+    private fun remaining(now: Long = System.currentTimeMillis()): Long {
+        val stored = prefs.getLong(KEY_REMAINING, 0L)
+        val started = prefs.getLong(KEY_STARTED, 0L)
+        if (started <= 0L) return stored
+        return (stored - (now - started)).coerceAtLeast(0L)
+    }
+
+    fun purchasedRemainingMs(): Long = remaining()
+
     fun isProductivitySessionRunning(): Boolean = prefs.getBoolean(KEY_PRODUCTIVITY, false)
     fun isAntiAddictionMode(): Boolean = prefs.getBoolean(KEY_ANTI_ADDICTION, false)
-    fun isEmergencyEnabled(): Boolean = prefs.getBoolean(KEY_EMERGENCY, false)
 
-    fun setProductivitySessionRunning(running: Boolean) =
+    fun setProductivitySessionRunning(running: Boolean) {
+        stopSocialUse()
         prefs.edit().putBoolean(KEY_PRODUCTIVITY, running).apply()
+    }
 
-    fun purchaseMinutes(minutes: Int, now: Long = System.currentTimeMillis()): Boolean {
+    fun purchaseMinutes(minutes: Int): Boolean {
         if (minutes <= 0) return false
-        val start = maxOf(now, purchasedUntil())
-        prefs.edit().putLong(KEY_UNTIL, start + minutes * 60_000L).apply()
+        stopSocialUse()
+        val total = remaining() + minutes * 60_000L
+        prefs.edit().putLong(KEY_REMAINING, total).apply()
         return true
     }
 
-    fun consumeExpired(now: Long = System.currentTimeMillis()) {
-        if (purchasedUntil() <= now) prefs.edit().putLong(KEY_UNTIL, 0L).apply()
+    fun startSocialUse() {
+        if (isProductivitySessionRunning() || remaining() <= 0L) return
+        if (prefs.getLong(KEY_STARTED, 0L) == 0L) {
+            prefs.edit().putLong(KEY_STARTED, System.currentTimeMillis()).apply()
+        }
     }
 
-    fun setAntiAddictionMode(enabled: Boolean) =
+    fun stopSocialUse() {
+        val started = prefs.getLong(KEY_STARTED, 0L)
+        if (started <= 0L) return
+        val left = (prefs.getLong(KEY_REMAINING, 0L) - (System.currentTimeMillis() - started)).coerceAtLeast(0L)
+        prefs.edit().putLong(KEY_REMAINING, left).putLong(KEY_STARTED, 0L).apply()
+    }
+
+    fun setAntiAddictionMode(enabled: Boolean) {
         prefs.edit().putBoolean(KEY_ANTI_ADDICTION, enabled).apply()
+    }
 
-    fun setEmergencyEnabled(enabled: Boolean) =
-        prefs.edit().putBoolean(KEY_EMERGENCY, enabled).apply()
-
-    fun remainingMinutes(now: Long = System.currentTimeMillis()): Int =
-        ((purchasedUntil() - now).coerceAtLeast(0L) / 60_000L).toInt()
+    fun remainingMinutes(): Int = (remaining() / 60_000L).toInt()
 
     companion object {
-        private const val KEY_UNTIL = "purchased_until"
+        private const val KEY_REMAINING = "remaining_ms"
+        private const val KEY_STARTED = "social_use_started"
         private const val KEY_PRODUCTIVITY = "productivity_session"
         private const val KEY_ANTI_ADDICTION = "anti_addiction"
-        private const val KEY_EMERGENCY = "emergency_enabled"
     }
 }
