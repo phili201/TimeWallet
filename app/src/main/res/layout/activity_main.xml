@@ -1,20 +1,50 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:background="@color/tesla_black" android:fillViewport="true" android:layout_width="match_parent" android:layout_height="match_parent">
-<LinearLayout android:orientation="vertical" android:padding="16dp" android:layout_width="match_parent" android:layout_height="wrap_content">
-<TextView android:text="TIMEWALLET" android:textColor="@color/tesla_text_primary" android:textSize="28sp" android:textStyle="bold" android:layout_width="match_parent" android:layout_height="wrap_content"/>
-<TextView android:id="@+id/coinsText" android:text="🪙 0 Coins" android:textColor="@color/tesla_blue" android:textSize="22sp" android:layout_marginTop="8dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
-<TextView android:id="@+id/socialTimeText" android:text="Social-Zeit: 0 Min" android:textColor="@color/tesla_text_secondary" android:layout_marginTop="4dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
-<TextView android:id="@+id/sessionTimeText" android:text="Keine aktive Session" android:textColor="@color/tesla_text_secondary" android:layout_marginTop="4dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
-<TextView android:id="@+id/messageText" android:textColor="@color/tesla_text_secondary" android:layout_marginTop="10dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
-<TextView android:text="Produktivität" android:textColor="@color/tesla_text_primary" android:textSize="20sp" android:textStyle="bold" android:layout_marginTop="24dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
-<LinearLayout android:orientation="horizontal" android:layout_marginTop="8dp" android:layout_width="match_parent" android:layout_height="wrap_content"><EditText android:id="@+id/taskInput" android:hint="Aufgabe" android:textColor="@color/tesla_text_primary" android:textColorHint="@color/tesla_text_secondary" android:backgroundTint="@color/tesla_blue" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"/><EditText android:id="@+id/durationInput" android:hint="Min." android:inputType="number" android:textColor="@color/tesla_text_primary" android:textColorHint="@color/tesla_text_secondary" android:backgroundTint="@color/tesla_blue" android:layout_marginStart="8dp" android:layout_width="80dp" android:layout_height="wrap_content"/></LinearLayout>
-<com.google.android.material.button.MaterialButton android:id="@+id/startSessionButton" android:text="Session starten" android:layout_marginTop="10dp" android:layout_width="match_parent" android:layout_height="56dp"/>
-<com.google.android.material.button.MaterialButton android:id="@+id/finishSessionButton" android:text="Mit Foto bestätigen" android:layout_marginTop="8dp" android:layout_width="match_parent" android:layout_height="56dp"/>
-<TextView android:text="Social-Shop" android:textColor="@color/tesla_text_primary" android:textSize="20sp" android:textStyle="bold" android:layout_marginTop="24dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
-<com.google.android.material.button.MaterialButton android:id="@+id/buy15Button" android:text="15 Min • 15 Coins" android:layout_marginTop="8dp" android:layout_width="match_parent" android:layout_height="52dp"/>
-<com.google.android.material.button.MaterialButton android:id="@+id/buy30Button" android:text="30 Min • 28 Coins" android:layout_marginTop="6dp" android:layout_width="match_parent" android:layout_height="52dp"/>
-<com.google.android.material.button.MaterialButton android:id="@+id/buy60Button" android:text="60 Min • 50 Coins" android:layout_marginTop="6dp" android:layout_width="match_parent" android:layout_height="52dp"/>
-<TextView android:text="Anti-Sucht" android:textColor="@color/tesla_text_primary" android:textSize="20sp" android:textStyle="bold" android:layout_marginTop="24dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
-<Switch android:id="@+id/antiAddictionSwitch" android:text="Social-Zeit bewusst nutzen" android:textColor="@color/tesla_text_primary" android:layout_width="match_parent" android:layout_height="wrap_content"/>
-<com.google.android.material.button.MaterialButton android:id="@+id/emergencyButton" android:text="Notfall-Modus" android:layout_marginTop="8dp" android:layout_width="match_parent" android:layout_height="52dp"/>
-<include android:id="@+id/bottomNav" layout="@layout/bottom_nav" android:layout_marginTop="24dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
-</LinearLayout></ScrollView>
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:orientation="vertical" android:background="@color/tesla_black" android:layout_width="match_parent" android:layout_height="match_parent">
+    <ScrollView android:fillViewport="true" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <LinearLayout android:orientation="vertical" android:padding="20dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+            <LinearLayout android:gravity="center_vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
+                <TextView android:text="TW" android:textColor="@color/tesla_black" android:textSize="18sp" android:textStyle="bold" android:gravity="center" android:background="@drawable/logo_circle" android:layout_width="48dp" android:layout_height="48dp" />
+                <LinearLayout android:orientation="vertical" android:layout_marginStart="12dp" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content">
+                    <TextView android:id="@+id/greetingText" android:text="Guten Tag" android:textColor="@color/tesla_text_secondary" android:textSize="14sp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:text="TimeWallet" android:textColor="@color/tesla_text_primary" android:textSize="25sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                </LinearLayout>
+                <TextView android:id="@+id/coinsText" android:text="0" android:textColor="@color/tesla_blue" android:textSize="20sp" android:textStyle="bold" android:gravity="center" android:background="@drawable/card_background" android:paddingStart="14dp" android:paddingEnd="14dp" android:layout_width="wrap_content" android:layout_height="44dp" />
+            </LinearLayout>
+
+            <com.google.android.material.card.MaterialCardView app:cardBackgroundColor="@color/tesla_surface" app:strokeColor="@color/tesla_blue" app:strokeWidth="1dp" app:cardCornerRadius="28dp" android:layout_marginTop="20dp" android:layout_width="match_parent" android:layout_height="330dp">
+                <LinearLayout android:gravity="center" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent">
+                    <FrameLayout android:layout_width="230dp" android:layout_height="230dp">
+                        <com.google.android.material.progressindicator.CircularProgressIndicator android:id="@+id/timerProgress" android:progress="0" android:max="100" app:indicatorSize="220dp" app:trackThickness="12dp" app:trackColor="@color/tesla_surface_variant" app:indicatorColor="@color/tesla_blue" android:layout_gravity="center" android:layout_width="230dp" android:layout_height="230dp" />
+                        <LinearLayout android:gravity="center" android:orientation="vertical" android:layout_gravity="center" android:layout_width="180dp" android:layout_height="180dp">
+                            <TextView android:id="@+id/timerRemainingText" android:text="25:00" android:textColor="@color/tesla_text_primary" android:textSize="38sp" android:textStyle="bold" android:gravity="center" android:layout_width="match_parent" android:layout_height="wrap_content" />
+                            <TextView android:id="@+id/timerStatusText" android:text="Bereit" android:textColor="@color/tesla_text_secondary" android:textSize="14sp" android:gravity="center" android:layout_width="match_parent" android:layout_height="wrap_content" />
+                        </LinearLayout>
+                    </FrameLayout>
+                    <TextView android:id="@+id/sessionTimeText" android:text="Keine aktive Session" android:textColor="@color/tesla_text_secondary" android:textSize="14sp" android:gravity="center" android:layout_width="match_parent" android:layout_height="wrap_content" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView android:text="Schnell starten" android:textColor="@color/tesla_text_primary" android:textSize="20sp" android:textStyle="bold" android:layout_marginTop="24dp" android:layout_width="match_parent" android:layout_height="wrap_content" />
+            <LinearLayout android:orientation="horizontal" android:layout_marginTop="10dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+                <EditText android:id="@+id/taskInput" android:hint="Was machst du?" android:textColor="@color/tesla_text_primary" android:textColorHint="@color/tesla_text_secondary" android:backgroundTint="@color/tesla_blue" android:layout_width="0dp" android:layout_weight="1" android:layout_height="56dp" />
+                <EditText android:id="@+id/durationInput" android:hint="Min" android:inputType="number" android:textColor="@color/tesla_text_primary" android:textColorHint="@color/tesla_text_secondary" android:backgroundTint="@color/tesla_blue" android:layout_marginStart="10dp" android:layout_width="70dp" android:layout_height="56dp" />
+            </LinearLayout>
+            <com.google.android.material.button.MaterialButton android:id="@+id/startSessionButton" android:text="Produktiv-Session starten" app:cornerRadius="18dp" android:layout_marginTop="10dp" android:layout_width="match_parent" android:layout_height="56dp" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/finishSessionButton" android:text="Foto zur Bestätigung aufnehmen" app:cornerRadius="18dp" android:layout_marginTop="8dp" android:layout_width="match_parent" android:layout_height="56dp" />
+
+            <com.google.android.material.card.MaterialCardView app:cardBackgroundColor="@color/tesla_surface" app:cardCornerRadius="22dp" android:layout_marginTop="20dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+                <LinearLayout android:orientation="vertical" android:padding="18dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+                    <TextView android:text="Social Wallet" android:textColor="@color/tesla_text_primary" android:textSize="20sp" android:textStyle="bold" android:layout_width="match_parent" android:layout_height="wrap_content" />
+                    <TextView android:id="@+id/socialTimeText" android:text="0 Min verfügbar" android:textColor="@color/tesla_text_secondary" android:layout_marginTop="4dp" android:layout_width="match_parent" android:layout_height="wrap_content" />
+                    <LinearLayout android:orientation="horizontal" android:layout_marginTop="12dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+                        <com.google.android.material.button.MaterialButton android:id="@+id/buy15Button" android:text="15 Min\n15 🪙" android:layout_width="0dp" android:layout_weight="1" android:layout_height="64dp" />
+                        <com.google.android.material.button.MaterialButton android:id="@+id/buy30Button" android:text="30 Min\n28 🪙" android:layout_marginStart="8dp" android:layout_width="0dp" android:layout_weight="1" android:layout_height="64dp" />
+                        <com.google.android.material.button.MaterialButton android:id="@+id/buy60Button" android:text="60 Min\n50 🪙" android:layout_marginStart="8dp" android:layout_width="0dp" android:layout_weight="1" android:layout_height="64dp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+            <TextView android:id="@+id/messageText" android:textColor="@color/tesla_text_secondary" android:gravity="center" android:padding="12dp" android:layout_width="match_parent" android:layout_height="wrap_content" />
+        </LinearLayout>
+    </ScrollView>
+    <include android:id="@+id/bottomNav" layout="@layout/bottom_nav" android:layout_width="match_parent" android:layout_height="78dp" />
+</LinearLayout>
