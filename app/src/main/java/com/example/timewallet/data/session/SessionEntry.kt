@@ -9,5 +9,6 @@ data class SessionEntry(
     val minutes: Int,
     val score: Int,
     val valid: Boolean,
-    val timestamp: Long
+    val timestamp: Long,
+    val task: String = ""
 )
