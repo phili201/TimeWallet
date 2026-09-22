@@ -8,23 +8,18 @@ import com.example.timewallet.TimeWalletApp
 import com.example.timewallet.ui.block.BlockScreenActivity
 
 class SocialBlockerService : AccessibilityService() {
-    // Keep the initial block list focused on the apps requested for TimeWallet.
-    private val blockedApps = setOf(
-        "com.instagram.android",
-        "com.google.android.youtube"
-    )
-
+    private val blockedApps = setOf("com.instagram.android", "com.google.android.youtube")
     private val repo by lazy { (application as TimeWalletApp).repository }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         if (event == null) return
         val pkg = event.packageName?.toString() ?: return
         if (pkg !in blockedApps) return
-        if (!repo.isAppAlive()) return
+        if (!repo.isAppAlive() || repo.isEmergencySwitchEnabled()) return
         if (repo.isSocialAllowed()) return
 
         startActivity(Intent(this, BlockScreenActivity::class.java).apply {
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
             putExtra(BlockScreenActivity.EXTRA_BLOCKED_PACKAGE, pkg)
         })
     }
