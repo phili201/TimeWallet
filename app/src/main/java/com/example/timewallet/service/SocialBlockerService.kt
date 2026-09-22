@@ -3,6 +3,8 @@ package com.example.timewallet.service
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
 import android.content.Intent
+import android.os.Handler
+import android.os.Looper
 import android.view.accessibility.AccessibilityEvent
 import com.example.timewallet.TimeWalletApp
 import com.example.timewallet.ui.block.BlockScreenActivity
@@ -10,7 +12,29 @@ import com.example.timewallet.ui.block.BlockScreenActivity
 class SocialBlockerService : AccessibilityService() {
     private val blockedApps = setOf("com.instagram.android", "com.google.android.youtube")
     private val repo by lazy { (application as TimeWalletApp).repository }
+    private val handler = Handler(Looper.getMainLooper())
     private var currentSocialPackage: String? = null
+
+    private val accessMonitor = object : Runnable {
+        override fun run() {
+            val pkg = currentSocialPackage
+            if (pkg != null) {
+                if (repo.isEmergencySwitchEnabled()) {
+                    repo.stopSocialUse()
+                    currentSocialPackage = null
+                } else if (repo.isProductivitySessionRunning()) {
+                    repo.stopSocialUse()
+                    showBlock(pkg, "Produktivsession aktiv")
+                    currentSocialPackage = null
+                } else if (!repo.isSocialAllowed()) {
+                    repo.stopSocialUse()
+                    showBlock(pkg, "Deine gekaufte Social-Zeit ist aufgebraucht")
+                    currentSocialPackage = null
+                }
+            }
+            handler.postDelayed(this, POLL_INTERVAL_MS)
+        }
+    }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         if (event == null || event.eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return
@@ -44,8 +68,17 @@ class SocialBlockerService : AccessibilityService() {
         })
     }
 
-    override fun onInterrupt() { repo.stopSocialUse() }
-    override fun onDestroy() { repo.stopSocialUse(); super.onDestroy() }
+    override fun onInterrupt() {
+        repo.stopSocialUse()
+        currentSocialPackage = null
+    }
+
+    override fun onDestroy() {
+        handler.removeCallbacks(accessMonitor)
+        repo.stopSocialUse()
+        currentSocialPackage = null
+        super.onDestroy()
+    }
 
     override fun onServiceConnected() {
         serviceInfo = AccessibilityServiceInfo().apply {
@@ -54,5 +87,11 @@ class SocialBlockerService : AccessibilityService() {
             flags = AccessibilityServiceInfo.FLAG_REPORT_VIEW_IDS
             notificationTimeout = 100
         }
+        handler.removeCallbacks(accessMonitor)
+        handler.post(accessMonitor)
+    }
+
+    companion object {
+        private const val POLL_INTERVAL_MS = 1_000L
     }
 }
