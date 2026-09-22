@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.example.timewallet">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.BIND_ACCESSIBILITY_SERVICE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <application android:name=".TimeWalletApp" android:allowBackup="true" android:label="TimeWallet" android:theme="@style/Theme.TimeWallet">
+    <application android:name=".TimeWalletApp" android:allowBackup="true" android:label="TimeWallet" android:icon="@drawable/ic_timewallet_logo" android:roundIcon="@drawable/ic_timewallet_logo" android:theme="@style/Theme.TimeWallet">
         <activity android:name=".ui.SplashActivity" android:exported="true" android:theme="@style/Theme.TimeWallet.Splash">
             <intent-filter><action android:name="android.intent.action.MAIN" /><category android:name="android.intent.category.LAUNCHER" /></intent-filter>
         </activity>
