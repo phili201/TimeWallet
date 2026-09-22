@@ -12,6 +12,7 @@ import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.timewallet.TimeWalletApp
@@ -24,7 +25,7 @@ import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     private val app get() = application as TimeWalletApp
-    private val viewModel: TimerViewModel by viewModels { com.example.timewallet.timer.TimerViewModelFactory(app) }
+    private val viewModel: TimerViewModel by viewModels { TimerViewModelFactoryCompat(app) }
     private lateinit var content: LinearLayout
     private lateinit var nav: LinearLayout
     private var selected = 0
@@ -42,6 +43,12 @@ class MainActivity : ComponentActivity() {
     private val text = Color.rgb(245, 247, 250)
     private val secondary = Color.rgb(160, 170, 184)
 
+    private val cameraLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK) {
+            result.data?.getStringExtra("photoPath")?.let(viewModel::finishSession)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.statusBarColor = bg
@@ -51,9 +58,11 @@ class MainActivity : ComponentActivity() {
             viewModel.state.collect { state ->
                 coinsText?.text = "${state.coins} 🪙"
                 socialText?.text = if (state.isRunning) "Während Fokus gesperrt" else "${state.socialRemainingMinutes} Minuten verfügbar"
-                timerText?.text = String.format("%02d:00", state.remainingMinutes)
+                val totalSeconds = state.sessionMinutes * 60
+                val remaining = state.remainingSeconds.coerceAtLeast(0)
+                timerText?.text = String.format("%02d:%02d", remaining / 60, remaining % 60)
                 timerStatus?.text = if (state.isRunning) "Fokus läuft • Social Apps gesperrt" else "Bereit für Fokus"
-                timerProgress?.progress = if (state.sessionMinutes > 0) ((state.elapsedMinutes * 100f) / state.sessionMinutes).toInt().coerceIn(0, 100) else 0
+                timerProgress?.progress = if (totalSeconds > 0) (((state.elapsedSeconds * 100f) / totalSeconds).toInt()).coerceIn(0, 100) else 0
                 messageText?.text = state.message.orEmpty()
             }
         }
@@ -105,7 +114,7 @@ class MainActivity : ComponentActivity() {
         val row = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
         row.addView(taskInput, LinearLayout.LayoutParams(0, 56.dp, 1f)); row.addView(duration, LinearLayout.LayoutParams(72.dp, 56.dp).apply { leftMargin = dp(8) }); content.addView(row)
         content.addView(button("Session starten") { viewModel.startSession(taskInput.text.toString().ifBlank { "Allgemein" }, duration.text.toString().toIntOrNull() ?: 25) })
-        content.addView(button("Foto zur Bestätigung aufnehmen") { startActivityForResult(Intent(this, CameraActivity::class.java), REQUEST_PHOTO) })
+        content.addView(button("Foto zur Bestätigung aufnehmen") { cameraLauncher.launch(Intent(this, CameraActivity::class.java)) })
         content.addView(tv("Deine Produktivität", 19, text, true).apply { setPadding(0, dp(18), 0, dp(8)) })
         val status = card(); status.addView(tv("🛡  Fokus schützt deine Zeit", 16, text, true)); status.addView(tv("Während einer Session bleiben Instagram und YouTube gesperrt – auch wenn Social-Zeit gekauft wurde.", 13, secondary, false).apply { setPadding(0, dp(6), 0, 0) }); content.addView(status)
     }
@@ -124,6 +133,7 @@ class MainActivity : ComponentActivity() {
         val balance = card(); coinsText = tv("0 🪙", 34, text, true); balance.addView(coinsText); socialText = tv("0 Minuten verfügbar", 14, secondary, false); balance.addView(socialText); content.addView(balance)
         content.addView(tv("Zeit kaufen", 19, text, true).apply { setPadding(0, dp(18), 0, dp(8)) })
         listOf(15 to 15, 30 to 28, 60 to 50).forEach { (minutes, cost) -> content.addView(button("$minutes Minuten     •     $cost 🪙") { if (app.repository.isProductivitySessionRunning()) Toast.makeText(this, "Während Fokus bleibt Social gesperrt.", Toast.LENGTH_SHORT).show() else viewModel.buySocialTime(minutes, cost) }) }
+        content.addView(button("Coin-Verlauf anzeigen") { startActivity(Intent(this, com.example.timewallet.ui.history.CoinHistoryActivity::class.java)) })
         content.addView(tv("Jeder Kauf wird lokal in deiner Wallet gespeichert. Während Fokus wird gekaufte Zeit nicht verbraucht.", 13, secondary, false).apply { setPadding(0, dp(12), 0, 0) })
     }
 
@@ -149,8 +159,15 @@ class MainActivity : ComponentActivity() {
     private fun lp(w: Int, margin: Int) = LinearLayout.LayoutParams(if (w == 1) -1 else w, -2).apply { topMargin = dp(margin) }
     private fun dp(v: Int) = (v * resources.displayMetrics.density).toInt()
     private val Int.dp get() = dp(this)
+}
 
-    @Deprecated("Use Activity Result APIs for new code")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) { super.onActivityResult(requestCode, resultCode, data); if (requestCode == REQUEST_PHOTO && resultCode == RESULT_OK) data?.getStringExtra("photoPath")?.let(viewModel::finishSession) }
-    companion object { private const val REQUEST_PHOTO = 1001 }
+// Kept as a tiny local adapter so MainActivity has no dependency on deprecated factories.
+private class TimerViewModelFactoryCompat(private val app: TimeWalletApp) : androidx.lifecycle.ViewModelProvider.Factory {
+    override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(TimerViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return TimerViewModel(app) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel: ${modelClass.name}")
+    }
 }
