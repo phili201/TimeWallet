@@ -41,7 +41,14 @@ class TimerViewModel(private val app: TimeWalletApp) : ViewModel() {
         val safeMinutes = minutes.coerceIn(1, 180)
         timerJob.cancel()
         repo.startProductivitySession()
-        _state.value = _state.value.copy(isRunning = true, remainingMinutes = safeMinutes, sessionMinutes = safeMinutes, elapsedMinutes = 0, currentTask = task, message = "Session gestartet: $task")
+        _state.value = _state.value.copy(
+            isRunning = true,
+            remainingMinutes = safeMinutes,
+            sessionMinutes = safeMinutes,
+            elapsedMinutes = 0,
+            currentTask = task,
+            message = "Session gestartet: $task"
+        )
         timerJob = viewModelScope.launch {
             while (_state.value.isRunning && _state.value.remainingMinutes > 0) {
                 delay(60_000)
@@ -50,7 +57,6 @@ class TimerViewModel(private val app: TimeWalletApp) : ViewModel() {
                 val remaining = (current.remainingMinutes - 1).coerceAtLeast(0)
                 _state.value = current.copy(remainingMinutes = remaining, elapsedMinutes = current.elapsedMinutes + 1)
                 if (remaining == 0) {
-                    repo.endProductivitySession()
                     _state.value = _state.value.copy(isRunning = false, message = "Session beendet – bitte Foto machen!")
                 }
             }
@@ -63,7 +69,6 @@ class TimerViewModel(private val app: TimeWalletApp) : ViewModel() {
             _state.value = current.copy(message = "Bitte erst die laufende Session vollständig beenden.")
             return
         }
-        repo.endProductivitySession()
         timerJob.cancel()
         viewModelScope.launch {
             val bitmap = BitmapFactory.decodeFile(photoPath)
@@ -73,11 +78,21 @@ class TimerViewModel(private val app: TimeWalletApp) : ViewModel() {
             }
             val result = SessionVerifier().calculateScore(bitmap)
             val minutes = _state.value.sessionMinutes
+            val task = _state.value.currentTask
             val valid = result.score >= 60
-            repo.insertSession(SessionEntry(minutes, result.score, valid, System.currentTimeMillis(), _state.value.currentTask))
+            repo.insertSession(
+                SessionEntry(
+                    minutes = minutes,
+                    score = result.score,
+                    valid = valid,
+                    timestamp = System.currentTimeMillis(),
+                    task = task
+                )
+            )
+            repo.endProductivitySession()
             if (valid) {
                 val coins = calculateCoins(minutes)
-                repo.insertCoin(CoinEntry(coins, "Produktive Session: ${_state.value.currentTask}", System.currentTimeMillis()))
+                repo.insertCoin(CoinEntry(coins, "Produktive Session: $task", System.currentTimeMillis()))
                 _state.value = _state.value.copy(isRunning = false, remainingMinutes = 0, message = "Session bestätigt ✔ +$coins Coins • Score: ${result.score}")
             } else {
                 _state.value = _state.value.copy(isRunning = false, message = "Session abgelehnt ❌ Score: ${result.score} (${result.reason})")
@@ -88,7 +103,6 @@ class TimerViewModel(private val app: TimeWalletApp) : ViewModel() {
     private fun calculateCoins(minutes: Int): Int = minutes + if (minutes >= 60) 10 else if (minutes >= 30) 5 else 0
 
     override fun onCleared() {
-        repo.endProductivitySession()
         timerJob.cancel()
         super.onCleared()
     }
