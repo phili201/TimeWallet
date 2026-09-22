@@ -20,7 +20,8 @@ class TimeWalletApp : Application() {
         }
         database = Room.databaseBuilder(this, AppDatabase::class.java, "timewallet.db")
             .addMigrations(migration1to2)
+            .fallbackToDestructiveMigrationOnDowngrade()
             .build()
-        repository = TimeWalletRepository(database.coinDao(), database.sessionDao())
+        repository = TimeWalletRepository(this, database.coinDao(), database.sessionDao())
     }
 }
