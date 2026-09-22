@@ -77,8 +77,8 @@ class MainActivity : ComponentActivity() {
         nav = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER; setPadding(6, 6, 6, 6); background = rounded(surface, 0) }
         listOf("⌂" to "Home", "✓" to "Aufgaben", "◉" to "Wallet", "⚙" to "Profil").forEachIndexed { i, pair ->
             val item = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; gravity = Gravity.CENTER; isClickable = true; setPadding(2, 4, 2, 4); setOnClickListener { showPage(i) } }
-            val icon = TextView(this).apply { text = pair.first; textSize = 23f; gravity = Gravity.CENTER; setTextColor(text) }
-            val label = TextView(this).apply { text = pair.second; textSize = 11f; gravity = Gravity.CENTER; setTextColor(text); setPadding(0, 2, 0, 0) }
+            val icon = TextView(this).apply { text = pair.first; textSize = 23f; gravity = Gravity.CENTER; setTextColor(this@MainActivity.text) }
+            val label = TextView(this).apply { text = pair.second; textSize = 11f; gravity = Gravity.CENTER; setTextColor(this@MainActivity.text); setPadding(0, 2, 0, 0) }
             item.addView(icon, LinearLayout.LayoutParams(-1, 34.dp)); item.addView(label, LinearLayout.LayoutParams(-1, 22.dp)); nav.addView(item, LinearLayout.LayoutParams(0, 66.dp, 1f))
         }
         root.addView(nav, LinearLayout.LayoutParams(-1, 78.dp))
@@ -108,8 +108,8 @@ class MainActivity : ComponentActivity() {
         timerCard.addView(messageText)
         content.addView(timerCard)
 
-        val taskInput = EditText(this).apply { hint = "z. B. Vokabeln lernen"; setTextColor(text); setHintTextColor(secondary); setSingleLine(true) }
-        val duration = EditText(this).apply { hint = "Min"; inputType = 2; setTextColor(text); setHintTextColor(secondary); setText("25"); setSingleLine(true) }
+        val taskInput = EditText(this).apply { hint = "z. B. Vokabeln lernen"; setTextColor(this@MainActivity.text); setHintTextColor(secondary); setSingleLine(true) }
+        val duration = EditText(this).apply { hint = "Min"; inputType = 2; setTextColor(this@MainActivity.text); setHintTextColor(secondary); setText("25"); setSingleLine(true) }
         content.addView(tv("Schnell starten", 19, text, true).apply { setPadding(0, dp(18), 0, dp(8)) })
         val row = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
         row.addView(taskInput, LinearLayout.LayoutParams(0, 56.dp, 1f)); row.addView(duration, LinearLayout.LayoutParams(72.dp, 56.dp).apply { leftMargin = dp(8) }); content.addView(row)
@@ -125,7 +125,7 @@ class MainActivity : ComponentActivity() {
         listOf("📚  Vokabeln lernen" to 25, "💻  Coden lernen" to 45, "🎓  Schulaufgaben" to 30, "📖  Lesen" to 25).forEach { (name, mins) ->
             val c = card(); c.addView(button("$name   •   $mins Min") { viewModel.startSession(name.substringAfter("  "), mins); showPage(0) }); content.addView(c)
         }
-        val custom = card(); custom.addView(tv("Eigene Aufgabe", 16, text, true)); val input = EditText(this).apply { hint = "Aufgabe"; setTextColor(text); setHintTextColor(secondary); setSingleLine() }; val min = EditText(this).apply { hint = "Minuten"; inputType = 2; setTextColor(text); setHintTextColor(secondary); setSingleLine() }; custom.addView(input); custom.addView(min); custom.addView(button("Eigene Session starten") { viewModel.startSession(input.text.toString().ifBlank { "Eigene Aufgabe" }, min.text.toString().toIntOrNull() ?: 25); showPage(0) }); content.addView(custom)
+        val custom = card(); custom.addView(tv("Eigene Aufgabe", 16, text, true)); val input = EditText(this).apply { hint = "Aufgabe"; setTextColor(this@MainActivity.text); setHintTextColor(secondary); setSingleLine() }; val min = EditText(this).apply { hint = "Minuten"; inputType = 2; setTextColor(this@MainActivity.text); setHintTextColor(secondary); setSingleLine() }; custom.addView(input); custom.addView(min); custom.addView(button("Eigene Session starten") { viewModel.startSession(input.text.toString().ifBlank { "Eigene Aufgabe" }, min.text.toString().toIntOrNull() ?: 25); showPage(0) }); content.addView(custom)
     }
 
     private fun walletPage() {
@@ -140,8 +140,8 @@ class MainActivity : ComponentActivity() {
     private fun profilePage() {
         header("Persönlich", "Profil & Einstellungen", false)
         val prefs = getSharedPreferences("profile", MODE_PRIVATE)
-        val c = card(); c.addView(tv("Dein Profil", 18, text, true)); val name = EditText(this).apply { hint = "Dein Name"; setText(prefs.getString("name", "")); setTextColor(text); setHintTextColor(secondary); setSingleLine() }; c.addView(name); c.addView(button("Profil speichern") { prefs.edit().putString("name", name.text.toString().trim()).apply(); Toast.makeText(this, "Profil gespeichert", Toast.LENGTH_SHORT).show() }); content.addView(c)
-        val security = card(); security.addView(tv("Sicherheit & Anti-Sucht", 18, text, true)); val anti = SwitchMaterial(this).apply { text = "Anti-Sucht-Modus"; isChecked = app.repository.isAntiAddictionModeEnabled(); setTextColor(text); setOnCheckedChangeListener { _, checked -> app.repository.setAntiAddictionMode(checked) } }; security.addView(anti); val emergency = SwitchMaterial(this).apply { text = "Notfall-Switch aktiv"; isChecked = app.repository.isEmergencySwitchEnabled(); setTextColor(text); setOnCheckedChangeListener { _, checked -> app.repository.setEmergencySwitchEnabled(checked) } }; security.addView(emergency); security.addView(tv("Der Notfall-Switch ist eine Sicherheitsausstiegsmöglichkeit und darf nie zum dauerhaften Aussperren vom eigenen Gerät führen.", 12, secondary, false).apply { setPadding(0, dp(8), 0, 0) }); content.addView(security)
+        val c = card(); c.addView(tv("Dein Profil", 18, text, true)); val name = EditText(this).apply { hint = "Dein Name"; setText(prefs.getString("name", "")); setTextColor(this@MainActivity.text); setHintTextColor(secondary); setSingleLine() }; c.addView(name); c.addView(button("Profil speichern") { prefs.edit().putString("name", name.text.toString().trim()).apply(); Toast.makeText(this, "Profil gespeichert", Toast.LENGTH_SHORT).show() }); content.addView(c)
+        val security = card(); security.addView(tv("Sicherheit & Anti-Sucht", 18, text, true)); val anti = SwitchMaterial(this).apply { text = "Anti-Sucht-Modus"; isChecked = app.repository.isAntiAddictionModeEnabled(); setTextColor(this@MainActivity.text); setOnCheckedChangeListener { _, checked -> app.repository.setAntiAddictionMode(checked) } }; security.addView(anti); val emergency = SwitchMaterial(this).apply { text = "Notfall-Switch aktiv"; isChecked = app.repository.isEmergencySwitchEnabled(); setTextColor(this@MainActivity.text); setOnCheckedChangeListener { _, checked -> app.repository.setEmergencySwitchEnabled(checked) } }; security.addView(emergency); security.addView(tv("Der Notfall-Switch ist eine Sicherheitsausstiegsmöglichkeit und darf nie zum dauerhaften Aussperren vom eigenen Gerät führen.", 12, secondary, false).apply { setPadding(0, dp(8), 0, 0) }); content.addView(security)
         content.addView(button("Rechtliches") { startActivity(Intent(this, com.example.timewallet.ui.legal.LegalActivity::class.java)) })
         content.addView(tv("TimeWallet 1.0 • Material 3 Dark", 12, secondary, false).apply { gravity = Gravity.CENTER; setPadding(0, dp(20), 0, dp(20)) })
     }
