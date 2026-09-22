@@ -1,58 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:background="#0D0D0D"
-    android:padding="24dp"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <TextView
-        android:text="Einstellungen"
-        android:textColor="#00E5FF"
-        android:textSize="28sp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-    <TextView
-        android:text="Sicherheit"
-        android:textColor="#FFFFFF"
-        android:textSize="20sp"
-        android:layout_marginTop="32dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-    <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/emergencySwitch"
-        android:text="Notfall-Schalter"
-        android:textColor="#FFFFFF"
-        android:layout_marginTop="12dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <TextView
-        android:text="Schaltet den Blocker als Wiederherstellungsfunktion aus."
-        android:textColor="#AAAAAA"
-        android:textSize="13sp"
-        android:layout_marginTop="4dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/antiAddictionSwitch"
-        android:text="Anti-Sucht-Modus"
-        android:textColor="#FFFFFF"
-        android:layout_marginTop="20dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <Button
-        android:id="@+id/backButton"
-        android:text="Zurück"
-        android:layout_marginTop="32dp"
-        android:layout_width="200dp"
-        android:layout_height="60dp"
-        android:backgroundTint="#00E5FF"
-        android:textColor="#000000"
-        android:textSize="18sp" />
-
-</LinearLayout>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:background="@color/tesla_black" android:fillViewport="true" android:layout_width="match_parent" android:layout_height="match_parent">
+    <LinearLayout android:orientation="vertical" android:padding="20dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+        <TextView android:text="PROFIL" android:textColor="@color/tesla_blue" android:textSize="13sp" android:textStyle="bold" android:letterSpacing="0.12" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+        <TextView android:text="Einstellungen" android:textColor="@color/tesla_text_primary" android:textSize="30sp" android:textStyle="bold" android:layout_marginTop="4dp" android:layout_width="match_parent" android:layout_height="wrap_content" />
+        <com.google.android.material.card.MaterialCardView app:cardBackgroundColor="@color/tesla_surface" app:cardCornerRadius="22dp" android:layout_marginTop="20dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+            <LinearLayout android:orientation="vertical" android:padding="18dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+                <TextView android:text="Dein Name" android:textColor="@color/tesla_text_primary" android:textSize="18sp" android:textStyle="bold" android:layout_width="match_parent" android:layout_height="wrap_content" />
+                <EditText android:id="@+id/nameInput" android:hint="Name eingeben" android:textColor="@color/tesla_text_primary" android:textColorHint="@color/tesla_text_secondary" android:backgroundTint="@color/tesla_blue" android:layout_marginTop="8dp" android:layout_width="match_parent" android:layout_height="56dp" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/saveButton" android:text="Profil speichern" app:cornerRadius="16dp" android:layout_marginTop="10dp" android:layout_width="match_parent" android:layout_height="52dp" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+        <TextView android:text="Sicherheit & Fokus" android:textColor="@color/tesla_text_primary" android:textSize="20sp" android:textStyle="bold" android:layout_marginTop="24dp" android:layout_width="match_parent" android:layout_height="wrap_content" />
+        <com.google.android.material.card.MaterialCardView app:cardBackgroundColor="@color/tesla_surface" app:cardCornerRadius="22dp" android:layout_marginTop="10dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+            <LinearLayout android:orientation="vertical" android:padding="8dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+                <com.google.android.material.switchmaterial.SwitchMaterial android:id="@+id/antiAddictionSwitch" android:text="Anti-Sucht-Modus" android:textColor="@color/tesla_text_primary" android:textSize="16sp" android:padding="10dp" android:layout_width="match_parent" android:layout_height="wrap_content" />
+                <TextView android:text="Begrenzt Social-Käufe und unterstützt bewusste Nutzung." android:textColor="@color/tesla_text_secondary" android:textSize="13sp" android:paddingStart="18dp" android:paddingEnd="18dp" android:paddingBottom="10dp" android:layout_width="match_parent" android:layout_height="wrap_content" />
+                <com.google.android.material.switchmaterial.SwitchMaterial android:id="@+id/emergencySwitch" android:text="Notfall-Schalter" android:textColor="@color/tesla_text_primary" android:textSize="16sp" android:padding="10dp" android:layout_width="match_parent" android:layout_height="wrap_content" />
+                <TextView android:text="Schaltet den Blocker als Wiederherstellungsfunktion aus." android:textColor="@color/tesla_text_secondary" android:textSize="13sp" android:paddingStart="18dp" android:paddingEnd="18dp" android:paddingBottom="10dp" android:layout_width="match_parent" android:layout_height="wrap_content" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+        <com.google.android.material.button.MaterialButton android:id="@+id/legalButton" android:text="Datenschutz & Rechtliches" app:cornerRadius="16dp" android:layout_marginTop="16dp" android:layout_width="match_parent" android:layout_height="52dp" />
+    </LinearLayout>
+</ScrollView>
