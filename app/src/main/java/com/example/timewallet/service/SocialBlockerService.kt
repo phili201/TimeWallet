@@ -10,21 +10,42 @@ import com.example.timewallet.ui.block.BlockScreenActivity
 class SocialBlockerService : AccessibilityService() {
     private val blockedApps = setOf("com.instagram.android", "com.google.android.youtube")
     private val repo by lazy { (application as TimeWalletApp).repository }
+    private var currentSocialPackage: String? = null
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
-        if (event == null) return
+        if (event == null || event.eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return
         val pkg = event.packageName?.toString() ?: return
+
+        if (currentSocialPackage != null && pkg != currentSocialPackage) {
+            repo.stopSocialUse()
+            currentSocialPackage = null
+        }
         if (pkg !in blockedApps) return
         if (!repo.isAppAlive() || repo.isEmergencySwitchEnabled()) return
-        if (repo.isSocialAllowed()) return
 
+        if (repo.isProductivitySessionRunning()) {
+            showBlock(pkg, "Produktivsession aktiv")
+            return
+        }
+        if (!repo.isSocialAllowed()) {
+            showBlock(pkg, "Deine gekaufte Social-Zeit ist aufgebraucht")
+            return
+        }
+
+        currentSocialPackage = pkg
+        repo.startSocialUse()
+    }
+
+    private fun showBlock(pkg: String, reason: String) {
         startActivity(Intent(this, BlockScreenActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
             putExtra(BlockScreenActivity.EXTRA_BLOCKED_PACKAGE, pkg)
+            putExtra(BlockScreenActivity.EXTRA_REASON, reason)
         })
     }
 
-    override fun onInterrupt() = Unit
+    override fun onInterrupt() { repo.stopSocialUse() }
+    override fun onDestroy() { repo.stopSocialUse(); super.onDestroy() }
 
     override fun onServiceConnected() {
         serviceInfo = AccessibilityServiceInfo().apply {
