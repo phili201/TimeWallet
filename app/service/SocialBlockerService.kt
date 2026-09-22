@@ -12,6 +12,7 @@ import com.example.timewallet.TimeWalletApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 class SocialBlockerService : AccessibilityService() {
@@ -28,7 +29,6 @@ class SocialBlockerService : AccessibilityService() {
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         if (event == null) return
 
-        // We only need window changes to determine which app is currently visible.
         if (event.eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED &&
             event.eventType != AccessibilityEvent.TYPE_WINDOWS_CHANGED) {
             return
@@ -40,8 +40,6 @@ class SocialBlockerService : AccessibilityService() {
             currentBlockedPackage = packageName
             checkAndBlock(packageName)
         } else {
-            // Leaving Instagram/YouTube removes the overlay. When the user opens
-            // a blocked app again, a fresh window event will trigger the block.
             removeOverlay()
             currentBlockedPackage = null
         }
@@ -76,9 +74,8 @@ class SocialBlockerService : AccessibilityService() {
         val windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
         val view = LayoutInflater.from(this).inflate(R.layout.blocker_overlay, null)
 
-        // The overlay deliberately remains in place while a blocked app is open.
-        // It must NOT remove itself when tapped; otherwise the user could simply
-        // tap once and bypass the blocker.
+        // Keep the overlay active. Removing it on a tap would make the blocker
+        // immediately bypassable.
         view.contentDescription = when (packageName) {
             "com.instagram.android" -> "Instagram ist blockiert"
             "com.google.android.youtube" -> "YouTube ist blockiert"
@@ -98,8 +95,6 @@ class SocialBlockerService : AccessibilityService() {
             windowManager.addView(view, params)
             overlayView = view
         } catch (_: SecurityException) {
-            // Overlay permission is optional at the OS level. The accessibility
-            // service still stays alive instead of crashing the whole service.
             overlayView = null
         } catch (_: WindowManager.BadTokenException) {
             overlayView = null
@@ -109,7 +104,6 @@ class SocialBlockerService : AccessibilityService() {
     private fun removeOverlay() {
         val view = overlayView ?: return
         val windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
-
         runCatching { windowManager.removeView(view) }
         overlayView = null
     }
