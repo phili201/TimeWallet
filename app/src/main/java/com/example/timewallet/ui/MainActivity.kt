@@ -14,12 +14,10 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.example.timewallet.R
 import com.example.timewallet.TimeWalletApp
 import com.example.timewallet.camera.CameraActivity
 import com.example.timewallet.timer.TimerViewModel
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.card.MaterialCardView
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.switchmaterial.SwitchMaterial
 import kotlinx.coroutines.launch
@@ -64,15 +62,15 @@ class MainActivity : ComponentActivity() {
 
     private fun buildShell() {
         val root = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setBackgroundColor(bg) }
-        content = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(18), dp(12), dp(18), dp(12) ) }
+        content = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(18), dp(12), dp(18), dp(12)) }
         val scroll = ScrollView(this).apply { isFillViewport = true; addView(content) }
         root.addView(scroll, LinearLayout.LayoutParams(-1, 0, 1f))
         nav = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER; setPadding(6, 6, 6, 6); background = rounded(surface, 0) }
         listOf("⌂" to "Home", "✓" to "Aufgaben", "◉" to "Wallet", "⚙" to "Profil").forEachIndexed { i, pair ->
             val item = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; gravity = Gravity.CENTER; isClickable = true; setPadding(2, 4, 2, 4); setOnClickListener { showPage(i) } }
-            val icon = TextView(this).apply { text = pair.first; textSize = 23f; gravity = Gravity.CENTER }
-            val label = TextView(this).apply { text = pair.second; textSize = 11f; gravity = Gravity.CENTER; setPadding(0, 2, 0, 0) }
-            item.addView(icon); item.addView(label); nav.addView(item, LinearLayout.LayoutParams(0, 66.dp, 1f))
+            val icon = TextView(this).apply { text = pair.first; textSize = 23f; gravity = Gravity.CENTER; setTextColor(text) }
+            val label = TextView(this).apply { text = pair.second; textSize = 11f; gravity = Gravity.CENTER; setTextColor(text); setPadding(0, 2, 0, 0) }
+            item.addView(icon, LinearLayout.LayoutParams(-1, 34.dp)); item.addView(label, LinearLayout.LayoutParams(-1, 22.dp)); nav.addView(item, LinearLayout.LayoutParams(0, 66.dp, 1f))
         }
         root.addView(nav, LinearLayout.LayoutParams(-1, 78.dp))
         setContentView(root)
@@ -82,29 +80,23 @@ class MainActivity : ComponentActivity() {
         selected = page
         content.removeAllViews()
         when (page) { 0 -> homePage(); 1 -> tasksPage(); 2 -> walletPage(); 3 -> profilePage() }
-        for (i in 0 until nav.childCount) {
-            val item = nav.getChildAt(i) as LinearLayout
-            val active = i == selected
-            item.alpha = if (active) 1f else .55f
-            item.getChildAt(0).setBackgroundColor(if (active) Color.argb(35, 0, 229, 255) else Color.TRANSPARENT)
-        }
+        for (i in 0 until nav.childCount) nav.getChildAt(i).alpha = if (i == selected) 1f else .55f
     }
 
     private fun homePage() {
         header("Guten Tag", "TimeWallet", true)
         val timerCard = card()
-        val title = tv("Fokus-Timer", 17, text, true)
-        timerCard.addView(title, lp(1, 0))
-        val frame = android.widget.FrameLayout(this).apply { layoutParams = lp(-1, 250) }
+        timerCard.addView(tv("Fokus-Timer", 17, text, true))
+        val frame = android.widget.FrameLayout(this)
         timerProgress = CircularProgressIndicator(this).apply { max = 100; progress = 0; isIndeterminate = false; setIndicatorColor(cyan); trackColor = Color.rgb(45, 50, 58); trackThickness = dp(11); indicatorSize = dp(210) }
         frame.addView(timerProgress, android.widget.FrameLayout.LayoutParams(dp(220), dp(220), Gravity.CENTER))
         val center = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; gravity = Gravity.CENTER }
         timerText = tv("25:00", 38, text, true).apply { gravity = Gravity.CENTER }
         timerStatus = tv("Bereit für Fokus", 12, secondary, false).apply { gravity = Gravity.CENTER; maxLines = 2 }
         center.addView(timerText); center.addView(timerStatus); frame.addView(center, android.widget.FrameLayout.LayoutParams(dp(190), dp(120), Gravity.CENTER))
-        timerCard.addView(frame)
+        timerCard.addView(frame, LinearLayout.LayoutParams(-1, 250.dp))
         messageText = tv("", 13, secondary, false).apply { gravity = Gravity.CENTER; setPadding(4, 4, 4, 4) }
-        timerCard.addView(messageText, lp(1, 0))
+        timerCard.addView(messageText)
         content.addView(timerCard)
 
         val taskInput = EditText(this).apply { hint = "z. B. Vokabeln lernen"; setTextColor(text); setHintTextColor(secondary); setSingleLine(true) }
@@ -112,10 +104,8 @@ class MainActivity : ComponentActivity() {
         content.addView(tv("Schnell starten", 19, text, true).apply { setPadding(0, dp(18), 0, dp(8)) })
         val row = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
         row.addView(taskInput, LinearLayout.LayoutParams(0, 56.dp, 1f)); row.addView(duration, LinearLayout.LayoutParams(72.dp, 56.dp).apply { leftMargin = dp(8) }); content.addView(row)
-        val start = button("Session starten") { viewModel.startSession(taskInput.text.toString().ifBlank { "Allgemein" }, duration.text.toString().toIntOrNull() ?: 25) }
-        content.addView(start)
-        val finish = button("Foto zur Bestätigung aufnehmen") { startActivityForResult(Intent(this, CameraActivity::class.java), REQUEST_PHOTO) }
-        content.addView(finish)
+        content.addView(button("Session starten") { viewModel.startSession(taskInput.text.toString().ifBlank { "Allgemein" }, duration.text.toString().toIntOrNull() ?: 25) })
+        content.addView(button("Foto zur Bestätigung aufnehmen") { startActivityForResult(Intent(this, CameraActivity::class.java), REQUEST_PHOTO) })
         content.addView(tv("Deine Produktivität", 19, text, true).apply { setPadding(0, dp(18), 0, dp(8)) })
         val status = card(); status.addView(tv("🛡  Fokus schützt deine Zeit", 16, text, true)); status.addView(tv("Während einer Session bleiben Instagram und YouTube gesperrt – auch wenn Social-Zeit gekauft wurde.", 13, secondary, false).apply { setPadding(0, dp(6), 0, 0) }); content.addView(status)
     }
@@ -124,7 +114,8 @@ class MainActivity : ComponentActivity() {
         header("Produktivität", "Deine Aufgaben", false)
         content.addView(tv("Verdiene Coins, indem du echte Zeit in produktive Aufgaben investierst.", 14, secondary, false).apply { setPadding(0, 0, 0, dp(12)) })
         listOf("📚  Vokabeln lernen" to 25, "💻  Coden lernen" to 45, "🎓  Schulaufgaben" to 30, "📖  Lesen" to 25).forEach { (name, mins) ->
-            val c = card(); val b = button("$name   •   $mins Min") { viewModel.startSession(name.substringAfter("  "), mins); showPage(0) }; c.addView(b); content.addView(c) }
+            val c = card(); c.addView(button("$name   •   $mins Min") { viewModel.startSession(name.substringAfter("  "), mins); showPage(0) }); content.addView(c)
+        }
         val custom = card(); custom.addView(tv("Eigene Aufgabe", 16, text, true)); val input = EditText(this).apply { hint = "Aufgabe"; setTextColor(text); setHintTextColor(secondary); setSingleLine() }; val min = EditText(this).apply { hint = "Minuten"; inputType = 2; setTextColor(text); setHintTextColor(secondary); setSingleLine() }; custom.addView(input); custom.addView(min); custom.addView(button("Eigene Session starten") { viewModel.startSession(input.text.toString().ifBlank { "Eigene Aufgabe" }, min.text.toString().toIntOrNull() ?: 25); showPage(0) }); content.addView(custom)
     }
 
@@ -151,7 +142,7 @@ class MainActivity : ComponentActivity() {
         row.addView(logo, LinearLayout.LayoutParams(48.dp, 48.dp)); val col = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(12), 0, 0, 0) }; col.addView(tv(kicker, 12, secondary, false)); col.addView(tv(title, 24, text, true)); row.addView(col, LinearLayout.LayoutParams(0, -2, 1f)); if (showCoins) { coinsText = tv("0 🪙", 17, cyan, true).apply { gravity = Gravity.CENTER; background = rounded(surface2, 18); setPadding(dp(12), 0, dp(12), 0) }; row.addView(coinsText, LinearLayout.LayoutParams(-2, 44.dp)) }; content.addView(row); content.addView(View(this).apply { setBackgroundColor(Color.TRANSPARENT) }, LinearLayout.LayoutParams(1, dp(12)))
     }
 
-    private fun card(): LinearLayout { val c = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(16), dp(16), dp(16), dp(16)); background = rounded(surface, 24) }; content.addView(c, lp(1, 10)); return c }
+    private fun card(): LinearLayout = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(16), dp(16), dp(16), dp(16)); background = rounded(surface, 24); layoutParams = lp(1, 10) }
     private fun button(label: String, action: () -> Unit): MaterialButton = MaterialButton(this).apply { text = label; setTextSize(14f); isAllCaps = false; setTextColor(bg); backgroundTintList = android.content.res.ColorStateList.valueOf(cyan); cornerRadius = dp(16); minHeight = dp(52); setOnClickListener { action() }; layoutParams = lp(1, 8) }
     private fun tv(value: String, size: Int, color: Int, bold: Boolean): TextView = TextView(this).apply { text = value; textSize = size.toFloat(); setTextColor(color); if (bold) typeface = android.graphics.Typeface.DEFAULT_BOLD }
     private fun rounded(color: Int, radius: Int) = GradientDrawable().apply { setColor(color); cornerRadius = dp(radius).toFloat() }
