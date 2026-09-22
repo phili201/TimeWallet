@@ -15,4 +15,7 @@ interface CoinDao {
 
     @Query("SELECT COALESCE(SUM(amount), 0) FROM coins")
     fun getBalance(): Flow<Int>
+
+    @Query("SELECT COALESCE(SUM(amount), 0) FROM coins")
+    suspend fun getBalanceOnce(): Int
 }
