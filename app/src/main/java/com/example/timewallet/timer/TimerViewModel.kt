@@ -15,6 +15,7 @@ import kotlinx.coroutines.launch
 
 data class TimerState(
     val coins: Int = 0,
+    val socialMinutes: Int = 0,
     val message: String? = null,
     val isRunning: Boolean = false,
     val remainingMinutes: Int = 0,
@@ -35,6 +36,12 @@ class TimerViewModel(private val app: TimeWalletApp) : ViewModel() {
                 _state.value = _state.value.copy(coins = balance)
             }
         }
+        viewModelScope.launch {
+            while (true) {
+                _state.value = _state.value.copy(socialMinutes = repo.getSocialRemainingMinutes())
+                delay(1_000)
+            }
+        }
     }
 
     fun startSession(task: String, minutes: Int) {
@@ -42,12 +49,9 @@ class TimerViewModel(private val app: TimeWalletApp) : ViewModel() {
         timerJob.cancel()
         repo.startProductivitySession()
         _state.value = _state.value.copy(
-            isRunning = true,
-            remainingMinutes = safeMinutes,
-            sessionMinutes = safeMinutes,
-            elapsedMinutes = 0,
-            currentTask = task,
-            message = "Session gestartet: $task"
+            isRunning = true, remainingMinutes = safeMinutes,
+            sessionMinutes = safeMinutes, elapsedMinutes = 0,
+            currentTask = task, message = "Session gestartet: $task"
         )
         timerJob = viewModelScope.launch {
             while (_state.value.isRunning && _state.value.remainingMinutes > 0) {
@@ -56,9 +60,7 @@ class TimerViewModel(private val app: TimeWalletApp) : ViewModel() {
                 if (!current.isRunning) break
                 val remaining = (current.remainingMinutes - 1).coerceAtLeast(0)
                 _state.value = current.copy(remainingMinutes = remaining, elapsedMinutes = current.elapsedMinutes + 1)
-                if (remaining == 0) {
-                    _state.value = _state.value.copy(isRunning = false, message = "Session beendet – bitte Foto machen!")
-                }
+                if (remaining == 0) _state.value = _state.value.copy(isRunning = false, message = "Session beendet – bitte Foto machen!")
             }
         }
     }
@@ -80,23 +82,23 @@ class TimerViewModel(private val app: TimeWalletApp) : ViewModel() {
             val minutes = _state.value.sessionMinutes
             val task = _state.value.currentTask
             val valid = result.score >= 60
-            repo.insertSession(
-                SessionEntry(
-                    minutes = minutes,
-                    score = result.score,
-                    valid = valid,
-                    timestamp = System.currentTimeMillis(),
-                    task = task
-                )
-            )
+            repo.insertSession(SessionEntry(minutes = minutes, score = result.score, valid = valid, timestamp = System.currentTimeMillis(), task = task))
             repo.endProductivitySession()
             if (valid) {
                 val coins = calculateCoins(minutes)
-                repo.insertCoin(CoinEntry(coins, "Produktive Session: $task", System.currentTimeMillis()))
+                repo.insertCoin(CoinEntry(amount = coins, reason = "Produktive Session: $task", timestamp = System.currentTimeMillis()))
                 _state.value = _state.value.copy(isRunning = false, remainingMinutes = 0, message = "Session bestätigt ✔ +$coins Coins • Score: ${result.score}")
             } else {
-                _state.value = _state.value.copy(isRunning = false, message = "Session abgelehnt ❌ Score: ${result.score} (${result.reason})")
+                repo.insertCoin(CoinEntry(amount = -5, reason = "Ungültige Session / Strafe", timestamp = System.currentTimeMillis()))
+                _state.value = _state.value.copy(isRunning = false, message = "Session abgelehnt ❌ Score: ${result.score}. -5 Coins")
             }
+        }
+    }
+
+    fun buySocialTime(minutes: Int, coinCost: Int) {
+        viewModelScope.launch {
+            val ok = repo.purchaseSocialTime(minutes, coinCost)
+            _state.value = _state.value.copy(message = if (ok) "$minutes Minuten gekauft ✔" else "Kauf nicht möglich – zu wenige Coins oder Anti-Sucht-Limit.")
         }
     }
 
@@ -104,6 +106,7 @@ class TimerViewModel(private val app: TimeWalletApp) : ViewModel() {
 
     override fun onCleared() {
         timerJob.cancel()
+        if (repo.isProductivitySessionRunning()) repo.endProductivitySession()
         super.onCleared()
     }
 }
