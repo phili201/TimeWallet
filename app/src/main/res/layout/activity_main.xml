@@ -1,124 +1,20 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/tesla_black"
-    android:fillViewport="true"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <LinearLayout
-        android:orientation="vertical"
-        android:padding="16dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:text="TIMEWALLET"
-            android:textColor="@color/tesla_text_primary"
-            android:textSize="28sp"
-            android:textStyle="bold"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:id="@+id/coinsText"
-            android:text="Coins: 0"
-            android:textColor="@color/tesla_blue"
-            android:textSize="22sp"
-            android:layout_marginTop="8dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:id="@+id/socialTimeText"
-            android:text="Social-Zeit: 0 Min"
-            android:textColor="@color/tesla_text_secondary"
-            android:textSize="16sp"
-            android:layout_marginTop="4dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:id="@+id/sessionTimeText"
-            android:text="Keine aktive Session"
-            android:textColor="@color/tesla_text_secondary"
-            android:textSize="16sp"
-            android:layout_marginTop="4dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:id="@+id/messageText"
-            android:textColor="@color/tesla_text_secondary"
-            android:textSize="14sp"
-            android:layout_marginTop="12dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_marginTop="16dp"
-            android:weightSum="2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <EditText
-                android:id="@+id/taskInput"
-                android:hint="Aufgabe"
-                android:textColor="@color/tesla_text_primary"
-                android:textColorHint="@color/tesla_text_secondary"
-                android:backgroundTint="@color/tesla_blue"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content" />
-
-            <EditText
-                android:id="@+id/durationInput"
-                android:hint="Minuten"
-                android:inputType="number"
-                android:textColor="@color/tesla_text_primary"
-                android:textColorHint="@color/tesla_text_secondary"
-                android:backgroundTint="@color/tesla_blue"
-                android:layout_marginStart="8dp"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/startSessionButton"
-            android:text="Produktive Session starten"
-            android:layout_marginTop="12dp"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            app:cornerRadius="12dp" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/finishSessionButton"
-            android:text="Session mit Foto bestätigen"
-            android:layout_marginTop="8dp"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            app:cornerRadius="12dp" />
-
-        <TextView
-            android:text="Social Media"
-            android:textColor="@color/tesla_text_primary"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:layout_marginTop="24dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:text="Instagram  •  YouTube  •  während Sessions blockiert"
-            android:textColor="@color/tesla_text_secondary"
-            android:layout_marginTop="6dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <include
-            android:id="@+id/bottomNav"
-            layout="@layout/bottom_nav"
-            android:layout_marginTop="24dp" />
-    </LinearLayout>
-</ScrollView>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:background="@color/tesla_black" android:fillViewport="true" android:layout_width="match_parent" android:layout_height="match_parent">
+<LinearLayout android:orientation="vertical" android:padding="16dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+<TextView android:text="TIMEWALLET" android:textColor="@color/tesla_text_primary" android:textSize="28sp" android:textStyle="bold" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<TextView android:id="@+id/coinsText" android:text="🪙 0 Coins" android:textColor="@color/tesla_blue" android:textSize="22sp" android:layout_marginTop="8dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<TextView android:id="@+id/socialTimeText" android:text="Social-Zeit: 0 Min" android:textColor="@color/tesla_text_secondary" android:layout_marginTop="4dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<TextView android:id="@+id/sessionTimeText" android:text="Keine aktive Session" android:textColor="@color/tesla_text_secondary" android:layout_marginTop="4dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<TextView android:id="@+id/messageText" android:textColor="@color/tesla_text_secondary" android:layout_marginTop="10dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<TextView android:text="Produktivität" android:textColor="@color/tesla_text_primary" android:textSize="20sp" android:textStyle="bold" android:layout_marginTop="24dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<LinearLayout android:orientation="horizontal" android:layout_marginTop="8dp" android:layout_width="match_parent" android:layout_height="wrap_content"><EditText android:id="@+id/taskInput" android:hint="Aufgabe" android:textColor="@color/tesla_text_primary" android:textColorHint="@color/tesla_text_secondary" android:backgroundTint="@color/tesla_blue" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"/><EditText android:id="@+id/durationInput" android:hint="Min." android:inputType="number" android:textColor="@color/tesla_text_primary" android:textColorHint="@color/tesla_text_secondary" android:backgroundTint="@color/tesla_blue" android:layout_marginStart="8dp" android:layout_width="80dp" android:layout_height="wrap_content"/></LinearLayout>
+<com.google.android.material.button.MaterialButton android:id="@+id/startSessionButton" android:text="Session starten" android:layout_marginTop="10dp" android:layout_width="match_parent" android:layout_height="56dp"/>
+<com.google.android.material.button.MaterialButton android:id="@+id/finishSessionButton" android:text="Mit Foto bestätigen" android:layout_marginTop="8dp" android:layout_width="match_parent" android:layout_height="56dp"/>
+<TextView android:text="Social-Shop" android:textColor="@color/tesla_text_primary" android:textSize="20sp" android:textStyle="bold" android:layout_marginTop="24dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<com.google.android.material.button.MaterialButton android:id="@+id/buy15Button" android:text="15 Min • 15 Coins" android:layout_marginTop="8dp" android:layout_width="match_parent" android:layout_height="52dp"/>
+<com.google.android.material.button.MaterialButton android:id="@+id/buy30Button" android:text="30 Min • 28 Coins" android:layout_marginTop="6dp" android:layout_width="match_parent" android:layout_height="52dp"/>
+<com.google.android.material.button.MaterialButton android:id="@+id/buy60Button" android:text="60 Min • 50 Coins" android:layout_marginTop="6dp" android:layout_width="match_parent" android:layout_height="52dp"/>
+<TextView android:text="Anti-Sucht" android:textColor="@color/tesla_text_primary" android:textSize="20sp" android:textStyle="bold" android:layout_marginTop="24dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<Switch android:id="@+id/antiAddictionSwitch" android:text="Social-Zeit bewusst nutzen" android:textColor="@color/tesla_text_primary" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<com.google.android.material.button.MaterialButton android:id="@+id/emergencyButton" android:text="Notfall-Modus" android:layout_marginTop="8dp" android:layout_width="match_parent" android:layout_height="52dp"/>
+<include android:id="@+id/bottomNav" layout="@layout/bottom_nav" android:layout_marginTop="24dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+</LinearLayout></ScrollView>
