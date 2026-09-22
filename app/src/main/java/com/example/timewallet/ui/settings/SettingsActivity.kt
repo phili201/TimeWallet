@@ -1,12 +1,15 @@
 package com.example.timewallet.ui.settings
 
+import android.content.ComponentName
 import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import com.example.timewallet.R
 import com.example.timewallet.TimeWalletApp
 import com.example.timewallet.databinding.ActivitySettingsBinding
+import com.example.timewallet.service.SocialBlockerService
 import com.example.timewallet.ui.legal.LegalActivity
 
 class SettingsActivity : ComponentActivity() {
@@ -30,6 +33,30 @@ class SettingsActivity : ComponentActivity() {
         }
         binding.emergencySwitch.setOnCheckedChangeListener { _, enabled -> repo.setEmergencySwitchEnabled(enabled) }
         binding.antiAddictionSwitch.setOnCheckedChangeListener { _, enabled -> repo.setAntiAddictionMode(enabled) }
+        binding.accessibilityButton.setOnClickListener {
+            startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+        }
         binding.legalButton.setOnClickListener { startActivity(Intent(this, LegalActivity::class.java)) }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        binding.accessibilityStatus.text = if (isAccessibilityServiceEnabled()) {
+            "Blocker aktiv"
+        } else {
+            "Blocker nicht aktiv – bitte aktivieren"
+        }
+    }
+
+    private fun isAccessibilityServiceEnabled(): Boolean {
+        val expected = ComponentName(this, SocialBlockerService::class.java)
+        val enabled = Settings.Secure.getString(
+            contentResolver,
+            Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
+        ) ?: return false
+
+        return enabled.split(':').any { entry ->
+            ComponentName.unflattenFromString(entry) == expected
+        }
     }
 }
