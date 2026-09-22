@@ -51,8 +51,18 @@ class TimerViewModel(private val app: TimeWalletApp) : ViewModel() {
     }
 
     fun startSession(task: String, minutes: Int) {
+        val current = _state.value
+        if (current.isRunning) {
+            _state.value = current.copy(message = "Eine Session läuft bereits.")
+            return
+        }
+        if (current.sessionMinutes > 0) {
+            _state.value = current.copy(message = "Bitte zuerst die abgeschlossene Session per Foto bestätigen.")
+            return
+        }
+
         val safeMinutes = minutes.coerceIn(1, 180)
-        val safeTask = task.ifBlank { "Allgemein" }
+        val safeTask = task.trim().ifBlank { "Allgemein" }
         timerJob?.cancel()
         val endAt = System.currentTimeMillis() + safeMinutes * 60_000L
         prefs.edit()
@@ -61,7 +71,7 @@ class TimerViewModel(private val app: TimeWalletApp) : ViewModel() {
             .putString(KEY_TASK, safeTask)
             .apply()
         repo.startProductivitySession()
-        _state.value = _state.value.copy(
+        _state.value = current.copy(
             isRunning = true,
             remainingMinutes = safeMinutes,
             remainingSeconds = safeMinutes * 60,
@@ -106,7 +116,7 @@ class TimerViewModel(private val app: TimeWalletApp) : ViewModel() {
                 currentTask = task,
                 message = "Session beendet – bitte Foto machen!"
             )
-            // Deliberately keep the productivity flag until verification succeeds.
+            // Keep the productivity flag until verification succeeds or is rejected.
         }
     }
 
@@ -117,15 +127,19 @@ class TimerViewModel(private val app: TimeWalletApp) : ViewModel() {
                 val remaining = ((endAt - System.currentTimeMillis()) / 1000L).toInt().coerceAtLeast(0)
                 val total = prefs.getLong(KEY_TOTAL_SECONDS, 60L).toInt().coerceAtLeast(1)
                 val elapsed = (total - remaining).coerceAtLeast(0)
-                val current = _state.value
-                _state.value = current.copy(
+                _state.value = _state.value.copy(
                     remainingMinutes = remaining / 60,
                     remainingSeconds = remaining,
                     elapsedMinutes = elapsed / 60,
                     elapsedSeconds = elapsed
                 )
                 if (remaining <= 0) {
-                    _state.value = _state.value.copy(isRunning = false, message = "Session beendet – bitte Foto machen!")
+                    _state.value = _state.value.copy(
+                        isRunning = false,
+                        remainingMinutes = 0,
+                        remainingSeconds = 0,
+                        message = "Session beendet – bitte Foto machen!"
+                    )
                     break
                 }
                 delay(1_000)
@@ -135,33 +149,90 @@ class TimerViewModel(private val app: TimeWalletApp) : ViewModel() {
 
     fun finishSession(photoPath: String) {
         val current = _state.value
-        if (current.sessionMinutes <= 0 || current.isRunning) {
-            _state.value = current.copy(message = "Bitte erst die laufende Session vollständig beenden.")
+        if (current.sessionMinutes <= 0) {
+            _state.value = current.copy(message = "Keine abgeschlossene Session wartet auf Bestätigung.")
             return
         }
+        if (current.isRunning) {
+            _state.value = current.copy(message = "Bitte die laufende Session vollständig beenden.")
+            return
+        }
+        if (photoPath.isBlank()) {
+            _state.value = current.copy(message = "Kein Foto ausgewählt.")
+            return
+        }
+
         timerJob?.cancel()
         viewModelScope.launch {
-            val bitmap = BitmapFactory.decodeFile(photoPath)
-            if (bitmap == null) {
-                _state.value = _state.value.copy(message = "Foto konnte nicht gelesen werden.")
-                return@launch
-            }
-            val result = SessionVerifier().calculateScore(bitmap)
-            val minutes = _state.value.sessionMinutes
-            val task = _state.value.currentTask
-            val valid = result.score >= 60
-            repo.insertSession(SessionEntry(minutes = minutes, score = result.score, valid = valid, timestamp = System.currentTimeMillis(), task = task))
-            if (valid) {
-                repo.endProductivitySession()
-                val coins = calculateCoins(minutes)
-                repo.insertCoin(CoinEntry(amount = coins, reason = "Produktive Session: $task", timestamp = System.currentTimeMillis()))
-                clearPersistedSession()
-                _state.value = _state.value.copy(isRunning = false, remainingMinutes = 0, remainingSeconds = 0, message = "Session bestätigt ✔ +$coins Coins • Score: ${result.score}")
-            } else {
-                repo.endProductivitySession()
-                repo.insertCoin(CoinEntry(amount = -5, reason = "Ungültige Session / Strafe", timestamp = System.currentTimeMillis()))
-                clearPersistedSession()
-                _state.value = _state.value.copy(isRunning = false, remainingMinutes = 0, remainingSeconds = 0, message = "Session abgelehnt ❌ Score: ${result.score}. -5 Coins")
+            try {
+                val bitmap = BitmapFactory.decodeFile(photoPath)
+                if (bitmap == null) {
+                    _state.value = _state.value.copy(message = "Foto konnte nicht gelesen werden. Bitte erneut aufnehmen.")
+                    return@launch
+                }
+
+                val result = SessionVerifier().calculateScore(bitmap)
+                bitmap.recycle()
+                val minutes = _state.value.sessionMinutes
+                val task = _state.value.currentTask
+                val valid = result.score >= 60
+                repo.insertSession(
+                    SessionEntry(
+                        minutes = minutes,
+                        score = result.score,
+                        valid = valid,
+                        timestamp = System.currentTimeMillis(),
+                        task = task
+                    )
+                )
+
+                if (valid) {
+                    repo.endProductivitySession()
+                    val coins = calculateCoins(minutes)
+                    repo.insertCoin(
+                        CoinEntry(
+                            amount = coins,
+                            reason = "Produktive Session: $task",
+                            timestamp = System.currentTimeMillis()
+                        )
+                    )
+                    clearPersistedSession()
+                    _state.value = _state.value.copy(
+                        isRunning = false,
+                        remainingMinutes = 0,
+                        remainingSeconds = 0,
+                        sessionMinutes = 0,
+                        elapsedMinutes = minutes,
+                        elapsedSeconds = minutes * 60,
+                        currentTask = "",
+                        message = "Session bestätigt ✔ +$coins Coins • Score: ${result.score}"
+                    )
+                } else {
+                    repo.endProductivitySession()
+                    repo.insertCoin(
+                        CoinEntry(
+                            amount = -5,
+                            reason = "Ungültige Session / Strafe",
+                            timestamp = System.currentTimeMillis()
+                        )
+                    )
+                    clearPersistedSession()
+                    _state.value = _state.value.copy(
+                        isRunning = false,
+                        remainingMinutes = 0,
+                        remainingSeconds = 0,
+                        sessionMinutes = 0,
+                        elapsedMinutes = minutes,
+                        elapsedSeconds = minutes * 60,
+                        currentTask = "",
+                        message = "Session abgelehnt ❌ Score: ${result.score}. -5 Coins"
+                    )
+                }
+            } catch (exception: Exception) {
+                // Do not destroy the pending session when verification fails unexpectedly.
+                _state.value = _state.value.copy(
+                    message = "Verifizierung fehlgeschlagen. Bitte erneut versuchen."
+                )
             }
         }
     }
@@ -169,11 +240,14 @@ class TimerViewModel(private val app: TimeWalletApp) : ViewModel() {
     fun buySocialTime(minutes: Int, coinCost: Int) {
         viewModelScope.launch {
             val ok = repo.purchaseSocialTime(minutes, coinCost)
-            _state.value = _state.value.copy(message = if (ok) "$minutes Minuten gekauft ✔" else "Kauf nicht möglich – zu wenige Coins oder ungültige Angaben.")
+            _state.value = _state.value.copy(
+                message = if (ok) "$minutes Minuten gekauft ✔" else "Kauf nicht möglich – zu wenige Coins oder ungültige Angaben."
+            )
         }
     }
 
-    private fun calculateCoins(minutes: Int): Int = minutes + if (minutes >= 60) 10 else if (minutes >= 30) 5 else 0
+    private fun calculateCoins(minutes: Int): Int =
+        minutes + if (minutes >= 60) 10 else if (minutes >= 30) 5 else 0
 
     private fun clearPersistedSession() {
         prefs.edit().clear().apply()
