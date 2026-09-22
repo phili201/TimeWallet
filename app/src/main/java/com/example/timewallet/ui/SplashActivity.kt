@@ -2,7 +2,6 @@ package com.example.timewallet.ui
 
 import android.content.ComponentName
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.view.animation.AnimationUtils
@@ -10,12 +9,13 @@ import android.widget.ImageView
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.timewallet.R
+import com.example.timewallet.service.SocialBlockerService
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class SplashActivity : ComponentActivity() {
 
-    private var openedPermissionSettings = false
+    private var openedAccessibilitySettings = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,35 +36,31 @@ class SplashActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (openedPermissionSettings) {
-            openedPermissionSettings = false
+        if (openedAccessibilitySettings) {
+            openedAccessibilitySettings = false
             continueAfterSplash()
         }
     }
 
     private fun continueAfterSplash() {
-        when {
-            !Settings.canDrawOverlays(this) -> {
-                openedPermissionSettings = true
-                startActivity(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION).apply {
-                    data = Uri.parse("package:$packageName")
-                })
-            }
-            !isAccessibilityServiceEnabled() -> {
-                openedPermissionSettings = true
-                startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
-            }
-            else -> openMain()
+        if (!isAccessibilityServiceEnabled()) {
+            openedAccessibilitySettings = true
+            startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+            return
         }
+        openMain()
     }
 
     private fun isAccessibilityServiceEnabled(): Boolean {
-        val expected = ComponentName(this, com.example.timewallet.service.SocialBlockerService::class.java)
+        val expected = ComponentName(this, SocialBlockerService::class.java)
         val enabled = Settings.Secure.getString(
             contentResolver,
             Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
         ) ?: return false
-        return enabled.split(':').any { ComponentName.unflattenFromString(it) == expected }
+
+        return enabled.split(':').any { entry ->
+            ComponentName.unflattenFromString(entry) == expected
+        }
     }
 
     private fun openMain() {
