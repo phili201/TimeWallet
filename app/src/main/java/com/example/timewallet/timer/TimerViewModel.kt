@@ -8,6 +8,7 @@ import com.example.timewallet.data.TimeWalletRepository
 import com.example.timewallet.data.coins.CoinEntry
 import com.example.timewallet.data.session.SessionEntry
 import com.example.timewallet.ki.SessionVerifier
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,7 +29,7 @@ class TimerViewModel(private val app: TimeWalletApp) : ViewModel() {
     private val repo: TimeWalletRepository = app.repository
     private val _state = MutableStateFlow(TimerState())
     val state: StateFlow<TimerState> = _state
-    private var timerJob = viewModelScope.launch { }
+    private var timerJob: Job? = null
 
     init {
         viewModelScope.launch { repo.getCoinBalance().collect { balance -> _state.value = _state.value.copy(coins = balance) } }
@@ -42,9 +43,16 @@ class TimerViewModel(private val app: TimeWalletApp) : ViewModel() {
 
     fun startSession(task: String, minutes: Int) {
         val safeMinutes = minutes.coerceIn(1, 180)
-        timerJob.cancel()
+        timerJob?.cancel()
         repo.startProductivitySession()
-        _state.value = _state.value.copy(isRunning = true, remainingMinutes = safeMinutes, sessionMinutes = safeMinutes, elapsedMinutes = 0, currentTask = task, message = "Session gestartet: $task")
+        _state.value = _state.value.copy(
+            isRunning = true,
+            remainingMinutes = safeMinutes,
+            sessionMinutes = safeMinutes,
+            elapsedMinutes = 0,
+            currentTask = task.ifBlank { "Allgemein" },
+            message = "Session gestartet: ${task.ifBlank { "Allgemein" }}"
+        )
         timerJob = viewModelScope.launch {
             while (_state.value.isRunning && _state.value.remainingMinutes > 0) {
                 delay(60_000)
@@ -52,7 +60,10 @@ class TimerViewModel(private val app: TimeWalletApp) : ViewModel() {
                 if (!current.isRunning) break
                 val remaining = (current.remainingMinutes - 1).coerceAtLeast(0)
                 _state.value = current.copy(remainingMinutes = remaining, elapsedMinutes = current.elapsedMinutes + 1)
-                if (remaining == 0) _state.value = _state.value.copy(isRunning = false, message = "Session beendet – bitte Foto machen!")
+                if (remaining == 0) {
+                    _state.value = _state.value.copy(isRunning = false, message = "Session beendet – bitte Foto machen!")
+                    // Keep social media blocked until verification is completed.
+                }
             }
         }
     }
@@ -63,10 +74,13 @@ class TimerViewModel(private val app: TimeWalletApp) : ViewModel() {
             _state.value = current.copy(message = "Bitte erst die laufende Session vollständig beenden.")
             return
         }
-        timerJob.cancel()
+        timerJob?.cancel()
         viewModelScope.launch {
             val bitmap = BitmapFactory.decodeFile(photoPath)
-            if (bitmap == null) { _state.value = _state.value.copy(message = "Foto konnte nicht gelesen werden."); return@launch }
+            if (bitmap == null) {
+                _state.value = _state.value.copy(message = "Foto konnte nicht gelesen werden.")
+                return@launch
+            }
             val result = SessionVerifier().calculateScore(bitmap)
             val minutes = _state.value.sessionMinutes
             val task = _state.value.currentTask
@@ -94,7 +108,7 @@ class TimerViewModel(private val app: TimeWalletApp) : ViewModel() {
     private fun calculateCoins(minutes: Int): Int = minutes + if (minutes >= 60) 10 else if (minutes >= 30) 5 else 0
 
     override fun onCleared() {
-        timerJob.cancel()
+        timerJob?.cancel()
         super.onCleared()
     }
 }
