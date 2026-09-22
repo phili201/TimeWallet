@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">TimeWallet</string>
+    <string name="accessibility_service_description">TimeWallet benötigt diesen Dienst, um ausgewählte Apps während gesperrter Zeiten zu erkennen und den Blocker darüberzulegen.</string>
 </resources>
