@@ -5,7 +5,11 @@ import androidx.activity.ComponentActivity
 import com.example.timewallet.databinding.ActivityBlockScreenBinding
 
 class BlockScreenActivity : ComponentActivity() {
-    companion object { const val EXTRA_BLOCKED_PACKAGE = "blockedPackage" }
+    companion object {
+        const val EXTRA_BLOCKED_PACKAGE = "blockedPackage"
+        const val EXTRA_REASON = "reason"
+    }
+
     private lateinit var binding: ActivityBlockScreenBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -16,11 +20,13 @@ class BlockScreenActivity : ComponentActivity() {
         setContentView(binding.root)
 
         val pkg = intent.getStringExtra(EXTRA_BLOCKED_PACKAGE).orEmpty()
+        val reason = intent.getStringExtra(EXTRA_REASON)
         binding.blockCountdown.text = when (pkg) {
             "com.instagram.android" -> "Instagram ist blockiert"
             "com.google.android.youtube" -> "YouTube ist blockiert"
             else -> "Zugang blockiert"
         }
+        binding.blockReason.text = reason ?: "Produktivität zuerst."
         binding.backButton.setOnClickListener { finishAndRemoveTask() }
     }
 }
