@@ -8,11 +8,8 @@ import com.example.timewallet.data.session.SessionDao
 import com.example.timewallet.data.session.SessionEntry
 
 @Database(
-    entities = [
-        CoinEntry::class,
-        SessionEntry::class
-    ],
-    version = 1,
+    entities = [CoinEntry::class, SessionEntry::class],
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
