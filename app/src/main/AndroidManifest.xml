@@ -1,73 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.timewallet">
-
-    <!-- Berechtigungen -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.example.timewallet">
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.BIND_ACCESSIBILITY_SERVICE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
-    <application
-        android:name=".TimeWalletApp"
-        android:allowBackup="true"
-        android:label="TimeWallet"
-        android:theme="@style/Theme.TimeWallet">
-
-        <!-- Splash Screen -->
-        <activity
-            android:name=".ui.SplashActivity"
-            android:exported="true"
-            android:theme="@style/Theme.TimeWallet.Splash">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
+    <application android:name=".TimeWalletApp" android:allowBackup="true" android:label="TimeWallet" android:theme="@style/Theme.TimeWallet">
+        <activity android:name=".ui.SplashActivity" android:exported="true" android:theme="@style/Theme.TimeWallet.Splash">
+            <intent-filter><action android:name="android.intent.action.MAIN" /><category android:name="android.intent.category.LAUNCHER" /></intent-filter>
         </activity>
-
-        <!-- Hauptbildschirm -->
-        <activity
-            android:name=".ui.MainActivity"
-            android:exported="true" />
-
-        <!-- Kamera -->
-        <activity
-            android:name=".camera.CameraActivity"
-            android:exported="false" />
-
-        <!-- Block Screen -->
-        <activity
-            android:name=".ui.block.BlockScreenActivity"
-            android:exported="false" />
-
-        <!-- Accessibility Blocker -->
-        <service
-            android:name=".service.SocialBlockerService"
-            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.accessibilityservice.AccessibilityService" />
-            </intent-filter>
-            <meta-data
-                android:name="android.accessibilityservice"
-                android:resource="@xml/accessibility_service_config" />
+        <activity android:name=".ui.MainActivity" android:exported="false" />
+        <activity android:name=".ui.TasksActivity" android:exported="false" />
+        <activity android:name=".ui.history.CoinHistoryActivity" android:exported="false" />
+        <activity android:name=".ui.settings.SettingsActivity" android:exported="false" />
+        <activity android:name=".ui.legal.LegalActivity" android:exported="false" />
+        <activity android:name=".ui.legal.LegalViewerActivity" android:exported="false" />
+        <activity android:name=".camera.CameraActivity" android:exported="false" />
+        <activity android:name=".ui.block.BlockScreenActivity" android:exported="false" />
+        <service android:name=".service.SocialBlockerService" android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE" android:exported="false">
+            <intent-filter><action android:name="android.accessibilityservice.AccessibilityService" /></intent-filter>
+            <meta-data android:name="android.accessibilityservice" android:resource="@xml/accessibility_service_config" />
         </service>
-
-        <!-- Boot Receiver: removed (no implementation present) -->
-
-        <!-- FileProvider für Kamera -->
-        <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="${applicationId}.provider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths"/>
+        <provider android:name="androidx.core.content.FileProvider" android:authorities="${applicationId}.provider" android:exported="false" android:grantUriPermissions="true">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths" />
         </provider>
-
     </application>
-
 </manifest>
