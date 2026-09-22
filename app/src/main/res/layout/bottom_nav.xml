@@ -10,7 +10,40 @@
         android:id="@+id/navHome"
         android:src="@drawable/ic_home"
         android:tint="#00E5FF"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:padding="8dp"/>
+        android:contentDescription="Home"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_weight="1"
+        android:padding="8dp" />
+
+    <ImageView
+        android:id="@+id/navStats"
+        android:src="@drawable/ic_stats"
+        android:tint="#FFFFFF"
+        android:contentDescription="Statistik"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_weight="1"
+        android:padding="8dp" />
+
+    <ImageView
+        android:id="@+id/navSettings"
+        android:src="@drawable/ic_settings"
+        android:tint="#FFFFFF"
+        android:contentDescription="Einstellungen"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_weight="1"
+        android:padding="8dp" />
+
+    <ImageView
+        android:id="@+id/navLegal"
+        android:src="@drawable/ic_info"
+        android:tint="#FFFFFF"
+        android:contentDescription="Rechtliches"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_weight="1"
+        android:padding="8dp" />
+
 </LinearLayout>
