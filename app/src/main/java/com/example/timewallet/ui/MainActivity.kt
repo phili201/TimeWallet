@@ -1,87 +1,165 @@
 package com.example.timewallet.ui
 
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
+import android.view.Gravity
+import android.view.View
+import android.widget.EditText
+import android.widget.LinearLayout
+import android.widget.ScrollView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.timewallet.R
 import com.example.timewallet.TimeWalletApp
-import com.example.timewallet.databinding.ActivityMainBinding
+import com.example.timewallet.camera.CameraActivity
 import com.example.timewallet.timer.TimerViewModel
-import com.example.timewallet.timer.TimerViewModelFactory
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.card.MaterialCardView
+import com.google.android.material.progressindicator.CircularProgressIndicator
+import com.google.android.material.switchmaterial.SwitchMaterial
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
-    private lateinit var binding: ActivityMainBinding
     private val app get() = application as TimeWalletApp
-    private val viewModel: TimerViewModel by viewModels { TimerViewModelFactory(app) }
+    private val viewModel: TimerViewModel by viewModels { com.example.timewallet.timer.TimerViewModelFactory(app) }
+    private lateinit var content: LinearLayout
+    private lateinit var nav: LinearLayout
+    private var selected = 0
+    private var timerText: TextView? = null
+    private var timerStatus: TextView? = null
+    private var timerProgress: CircularProgressIndicator? = null
+    private var coinsText: TextView? = null
+    private var socialText: TextView? = null
+    private var messageText: TextView? = null
+
+    private val bg = Color.rgb(5, 6, 8)
+    private val surface = Color.rgb(17, 19, 24)
+    private val surface2 = Color.rgb(24, 27, 33)
+    private val cyan = Color.rgb(0, 229, 255)
+    private val text = Color.rgb(245, 247, 250)
+    private val secondary = Color.rgb(160, 170, 184)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        window.statusBarColor = getColor(R.color.tesla_black)
-        window.navigationBarColor = getColor(R.color.tesla_surface)
-
-        val name = getSharedPreferences("profile", MODE_PRIVATE).getString("name", "")
-        binding.greetingText.text = if (name.isNullOrBlank()) "Bereit für deine nächste Session" else "Guten Tag, $name"
-        binding.durationInput.setText("25")
-
+        window.statusBarColor = bg
+        window.navigationBarColor = surface
+        buildShell()
         lifecycleScope.launch {
             viewModel.state.collect { state ->
-                binding.coinsText.text = "🪙 ${state.coins}"
-                binding.socialTimeText.text = if (state.isRunning) "Während der Session gesperrt" else "${state.socialRemainingMinutes} Minuten verfügbar"
-                binding.sessionTimeText.text = if (state.isRunning) "${state.currentTask} • ${state.elapsedMinutes}/${state.sessionMinutes} Min" else if (state.sessionMinutes > 0) "Letzte Session • ${state.sessionMinutes} Min" else "Noch keine Session"
-                binding.messageText.text = state.message ?: ""
-                binding.startSessionButton.isEnabled = !state.isRunning
-                binding.finishSessionButton.isEnabled = !state.isRunning && state.sessionMinutes > 0
-                binding.timerStatusText.text = if (state.isRunning) "Fokus läuft • Social Apps gesperrt" else "Bereit für Fokus"
-                binding.timerRemainingText.text = "${state.remainingMinutes}:00"
-                binding.timerProgress.progress = if (state.sessionMinutes > 0) ((state.elapsedMinutes * 100f) / state.sessionMinutes).toInt().coerceIn(0, 100) else 0
+                coinsText?.text = "${state.coins} 🪙"
+                socialText?.text = if (state.isRunning) "Während Fokus gesperrt" else "${state.socialRemainingMinutes} Minuten verfügbar"
+                timerText?.text = String.format("%02d:00", state.remainingMinutes)
+                timerStatus?.text = if (state.isRunning) "Fokus läuft • Social Apps gesperrt" else "Bereit für Fokus"
+                timerProgress?.progress = if (state.sessionMinutes > 0) ((state.elapsedMinutes * 100f) / state.sessionMinutes).toInt().coerceIn(0, 100) else 0
+                messageText?.text = state.message.orEmpty()
             }
         }
+        showPage(0)
+    }
 
-        binding.startSessionButton.setOnClickListener {
-            viewModel.startSession(binding.taskInput.text.toString().ifBlank { "Allgemein" }, binding.durationInput.text.toString().toIntOrNull() ?: 25)
+    private fun buildShell() {
+        val root = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setBackgroundColor(bg) }
+        content = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(18), dp(12), dp(18), dp(12) ) }
+        val scroll = ScrollView(this).apply { isFillViewport = true; addView(content) }
+        root.addView(scroll, LinearLayout.LayoutParams(-1, 0, 1f))
+        nav = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER; setPadding(6, 6, 6, 6); background = rounded(surface, 0) }
+        listOf("⌂" to "Home", "✓" to "Aufgaben", "◉" to "Wallet", "⚙" to "Profil").forEachIndexed { i, pair ->
+            val item = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; gravity = Gravity.CENTER; isClickable = true; setPadding(2, 4, 2, 4); setOnClickListener { showPage(i) } }
+            val icon = TextView(this).apply { text = pair.first; textSize = 23f; gravity = Gravity.CENTER }
+            val label = TextView(this).apply { text = pair.second; textSize = 11f; gravity = Gravity.CENTER; setPadding(0, 2, 0, 0) }
+            item.addView(icon); item.addView(label); nav.addView(item, LinearLayout.LayoutParams(0, 66.dp, 1f))
         }
-        binding.finishSessionButton.setOnClickListener {
-            startActivityForResult(Intent(this, com.example.timewallet.camera.CameraActivity::class.java), REQUEST_PHOTO)
-        }
-        binding.buy15Button.setOnClickListener { buy(15, 15) }
-        binding.buy30Button.setOnClickListener { buy(30, 28) }
-        binding.buy60Button.setOnClickListener { buy(60, 50) }
+        root.addView(nav, LinearLayout.LayoutParams(-1, 78.dp))
+        setContentView(root)
+    }
 
-        binding.bottomNav.root.findViewById<android.view.View>(R.id.navHome).setOnClickListener { binding.root.findFocus() }
-        binding.bottomNav.root.findViewById<android.view.View>(R.id.navTasks).setOnClickListener { startActivity(Intent(this, TasksActivity::class.java)) }
-        binding.bottomNav.root.findViewById<android.view.View>(R.id.navStats).setOnClickListener { startActivity(Intent(this, com.example.timewallet.ui.history.CoinHistoryActivity::class.java)) }
-        binding.bottomNav.root.findViewById<android.view.View>(R.id.navSettings).setOnClickListener { startActivity(Intent(this, com.example.timewallet.ui.settings.SettingsActivity::class.java)) }
-
-        intent.getStringExtra("task")?.let { task ->
-            val minutes = intent.getIntExtra("minutes", 25)
-            binding.taskInput.setText(task)
-            binding.durationInput.setText(minutes.toString())
-            binding.root.post { viewModel.startSession(task, minutes) }
+    private fun showPage(page: Int) {
+        selected = page
+        content.removeAllViews()
+        when (page) { 0 -> homePage(); 1 -> tasksPage(); 2 -> walletPage(); 3 -> profilePage() }
+        for (i in 0 until nav.childCount) {
+            val item = nav.getChildAt(i) as LinearLayout
+            val active = i == selected
+            item.alpha = if (active) 1f else .55f
+            item.getChildAt(0).setBackgroundColor(if (active) Color.argb(35, 0, 229, 255) else Color.TRANSPARENT)
         }
     }
 
-    private fun buy(minutes: Int, cost: Int) {
-        lifecycleScope.launch {
-            if (app.repository.isProductivitySessionRunning()) {
-                Toast.makeText(this@MainActivity, "Während einer Fokus-Session bleibt Social gesperrt.", Toast.LENGTH_SHORT).show()
-                return@launch
-            }
-            val ok = app.repository.purchaseSocialTime(minutes, cost)
-            Toast.makeText(this@MainActivity, if (ok) "$minutes Minuten gekauft." else "Nicht genug Coins.", Toast.LENGTH_SHORT).show()
-        }
+    private fun homePage() {
+        header("Guten Tag", "TimeWallet", true)
+        val timerCard = card()
+        val title = tv("Fokus-Timer", 17, text, true)
+        timerCard.addView(title, lp(1, 0))
+        val frame = android.widget.FrameLayout(this).apply { layoutParams = lp(-1, 250) }
+        timerProgress = CircularProgressIndicator(this).apply { max = 100; progress = 0; isIndeterminate = false; setIndicatorColor(cyan); trackColor = Color.rgb(45, 50, 58); trackThickness = dp(11); indicatorSize = dp(210) }
+        frame.addView(timerProgress, android.widget.FrameLayout.LayoutParams(dp(220), dp(220), Gravity.CENTER))
+        val center = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; gravity = Gravity.CENTER }
+        timerText = tv("25:00", 38, text, true).apply { gravity = Gravity.CENTER }
+        timerStatus = tv("Bereit für Fokus", 12, secondary, false).apply { gravity = Gravity.CENTER; maxLines = 2 }
+        center.addView(timerText); center.addView(timerStatus); frame.addView(center, android.widget.FrameLayout.LayoutParams(dp(190), dp(120), Gravity.CENTER))
+        timerCard.addView(frame)
+        messageText = tv("", 13, secondary, false).apply { gravity = Gravity.CENTER; setPadding(4, 4, 4, 4) }
+        timerCard.addView(messageText, lp(1, 0))
+        content.addView(timerCard)
+
+        val taskInput = EditText(this).apply { hint = "z. B. Vokabeln lernen"; setTextColor(text); setHintTextColor(secondary); setSingleLine(true) }
+        val duration = EditText(this).apply { hint = "Min"; inputType = 2; setTextColor(text); setHintTextColor(secondary); setText("25"); setSingleLine(true) }
+        content.addView(tv("Schnell starten", 19, text, true).apply { setPadding(0, dp(18), 0, dp(8)) })
+        val row = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+        row.addView(taskInput, LinearLayout.LayoutParams(0, 56.dp, 1f)); row.addView(duration, LinearLayout.LayoutParams(72.dp, 56.dp).apply { leftMargin = dp(8) }); content.addView(row)
+        val start = button("Session starten") { viewModel.startSession(taskInput.text.toString().ifBlank { "Allgemein" }, duration.text.toString().toIntOrNull() ?: 25) }
+        content.addView(start)
+        val finish = button("Foto zur Bestätigung aufnehmen") { startActivityForResult(Intent(this, CameraActivity::class.java), REQUEST_PHOTO) }
+        content.addView(finish)
+        content.addView(tv("Deine Produktivität", 19, text, true).apply { setPadding(0, dp(18), 0, dp(8)) })
+        val status = card(); status.addView(tv("🛡  Fokus schützt deine Zeit", 16, text, true)); status.addView(tv("Während einer Session bleiben Instagram und YouTube gesperrt – auch wenn Social-Zeit gekauft wurde.", 13, secondary, false).apply { setPadding(0, dp(6), 0, 0) }); content.addView(status)
     }
+
+    private fun tasksPage() {
+        header("Produktivität", "Deine Aufgaben", false)
+        content.addView(tv("Verdiene Coins, indem du echte Zeit in produktive Aufgaben investierst.", 14, secondary, false).apply { setPadding(0, 0, 0, dp(12)) })
+        listOf("📚  Vokabeln lernen" to 25, "💻  Coden lernen" to 45, "🎓  Schulaufgaben" to 30, "📖  Lesen" to 25).forEach { (name, mins) ->
+            val c = card(); val b = button("$name   •   $mins Min") { viewModel.startSession(name.substringAfter("  "), mins); showPage(0) }; c.addView(b); content.addView(c) }
+        val custom = card(); custom.addView(tv("Eigene Aufgabe", 16, text, true)); val input = EditText(this).apply { hint = "Aufgabe"; setTextColor(text); setHintTextColor(secondary); setSingleLine() }; val min = EditText(this).apply { hint = "Minuten"; inputType = 2; setTextColor(text); setHintTextColor(secondary); setSingleLine() }; custom.addView(input); custom.addView(min); custom.addView(button("Eigene Session starten") { viewModel.startSession(input.text.toString().ifBlank { "Eigene Aufgabe" }, min.text.toString().toIntOrNull() ?: 25); showPage(0) }); content.addView(custom)
+    }
+
+    private fun walletPage() {
+        header("Dein Guthaben", "Social Wallet", false)
+        val balance = card(); coinsText = tv("0 🪙", 34, text, true); balance.addView(coinsText); socialText = tv("0 Minuten verfügbar", 14, secondary, false); balance.addView(socialText); content.addView(balance)
+        content.addView(tv("Zeit kaufen", 19, text, true).apply { setPadding(0, dp(18), 0, dp(8)) })
+        listOf(15 to 15, 30 to 28, 60 to 50).forEach { (minutes, cost) -> content.addView(button("$minutes Minuten     •     $cost 🪙") { if (app.repository.isProductivitySessionRunning()) Toast.makeText(this, "Während Fokus bleibt Social gesperrt.", Toast.LENGTH_SHORT).show() else viewModel.buySocialTime(minutes, cost) }) }
+        content.addView(tv("Jeder Kauf wird lokal in deiner Wallet gespeichert. Während Fokus wird gekaufte Zeit nicht verbraucht.", 13, secondary, false).apply { setPadding(0, dp(12), 0, 0) })
+    }
+
+    private fun profilePage() {
+        header("Persönlich", "Profil & Einstellungen", false)
+        val prefs = getSharedPreferences("profile", MODE_PRIVATE)
+        val c = card(); c.addView(tv("Dein Profil", 18, text, true)); val name = EditText(this).apply { hint = "Dein Name"; setText(prefs.getString("name", "")); setTextColor(text); setHintTextColor(secondary); setSingleLine() }; c.addView(name); c.addView(button("Profil speichern") { prefs.edit().putString("name", name.text.toString().trim()).apply(); Toast.makeText(this, "Profil gespeichert", Toast.LENGTH_SHORT).show() }); content.addView(c)
+        val security = card(); security.addView(tv("Sicherheit & Anti-Sucht", 18, text, true)); val anti = SwitchMaterial(this).apply { text = "Anti-Sucht-Modus"; isChecked = app.repository.isAntiAddictionModeEnabled(); setTextColor(text); setOnCheckedChangeListener { _, checked -> app.repository.setAntiAddictionMode(checked) } }; security.addView(anti); val emergency = SwitchMaterial(this).apply { text = "Notfall-Switch aktiv"; isChecked = app.repository.isEmergencySwitchEnabled(); setTextColor(text); setOnCheckedChangeListener { _, checked -> app.repository.setEmergencySwitchEnabled(checked) } }; security.addView(emergency); security.addView(tv("Der Notfall-Switch ist eine Sicherheitsausstiegsmöglichkeit und darf nie zum dauerhaften Aussperren vom eigenen Gerät führen.", 12, secondary, false).apply { setPadding(0, dp(8), 0, 0) }); content.addView(security)
+        content.addView(button("Rechtliches") { startActivity(Intent(this, com.example.timewallet.ui.legal.LegalActivity::class.java)) })
+        content.addView(tv("TimeWallet 1.0 • Material 3 Dark", 12, secondary, false).apply { gravity = Gravity.CENTER; setPadding(0, dp(20), 0, dp(20)) })
+    }
+
+    private fun header(kicker: String, title: String, showCoins: Boolean) {
+        val row = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
+        val logo = TextView(this).apply { text = "TW"; textSize = 17f; gravity = Gravity.CENTER; setTextColor(bg); background = rounded(cyan, 18); typeface = android.graphics.Typeface.DEFAULT_BOLD }
+        row.addView(logo, LinearLayout.LayoutParams(48.dp, 48.dp)); val col = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(12), 0, 0, 0) }; col.addView(tv(kicker, 12, secondary, false)); col.addView(tv(title, 24, text, true)); row.addView(col, LinearLayout.LayoutParams(0, -2, 1f)); if (showCoins) { coinsText = tv("0 🪙", 17, cyan, true).apply { gravity = Gravity.CENTER; background = rounded(surface2, 18); setPadding(dp(12), 0, dp(12), 0) }; row.addView(coinsText, LinearLayout.LayoutParams(-2, 44.dp)) }; content.addView(row); content.addView(View(this).apply { setBackgroundColor(Color.TRANSPARENT) }, LinearLayout.LayoutParams(1, dp(12)))
+    }
+
+    private fun card(): LinearLayout { val c = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(16), dp(16), dp(16), dp(16)); background = rounded(surface, 24) }; content.addView(c, lp(1, 10)); return c }
+    private fun button(label: String, action: () -> Unit): MaterialButton = MaterialButton(this).apply { text = label; setTextSize(14f); isAllCaps = false; setTextColor(bg); backgroundTintList = android.content.res.ColorStateList.valueOf(cyan); cornerRadius = dp(16); minHeight = dp(52); setOnClickListener { action() }; layoutParams = lp(1, 8) }
+    private fun tv(value: String, size: Int, color: Int, bold: Boolean): TextView = TextView(this).apply { text = value; textSize = size.toFloat(); setTextColor(color); if (bold) typeface = android.graphics.Typeface.DEFAULT_BOLD }
+    private fun rounded(color: Int, radius: Int) = GradientDrawable().apply { setColor(color); cornerRadius = dp(radius).toFloat() }
+    private fun lp(w: Int, margin: Int) = LinearLayout.LayoutParams(if (w == 1) -1 else w, -2).apply { topMargin = dp(margin) }
+    private fun dp(v: Int) = (v * resources.displayMetrics.density).toInt()
+    private val Int.dp get() = dp(this)
 
     @Deprecated("Use Activity Result APIs for new code")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_PHOTO && resultCode == RESULT_OK) data?.getStringExtra("photoPath")?.let(viewModel::finishSession)
-    }
-
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) { super.onActivityResult(requestCode, resultCode, data); if (requestCode == REQUEST_PHOTO && resultCode == RESULT_OK) data?.getStringExtra("photoPath")?.let(viewModel::finishSession) }
     companion object { private const val REQUEST_PHOTO = 1001 }
 }
