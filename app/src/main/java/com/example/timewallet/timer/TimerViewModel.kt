@@ -40,29 +40,18 @@ class TimerViewModel(private val app: TimeWalletApp) : ViewModel() {
     fun startSession(task: String, minutes: Int) {
         val safeMinutes = minutes.coerceIn(1, 180)
         timerJob.cancel()
-        _state.value = _state.value.copy(
-            isRunning = true,
-            remainingMinutes = safeMinutes,
-            sessionMinutes = safeMinutes,
-            elapsedMinutes = 0,
-            currentTask = task,
-            message = "Session gestartet: $task"
-        )
+        repo.startProductivitySession()
+        _state.value = _state.value.copy(isRunning = true, remainingMinutes = safeMinutes, sessionMinutes = safeMinutes, elapsedMinutes = 0, currentTask = task, message = "Session gestartet: $task")
         timerJob = viewModelScope.launch {
             while (_state.value.isRunning && _state.value.remainingMinutes > 0) {
                 delay(60_000)
                 val current = _state.value
                 if (!current.isRunning) break
                 val remaining = (current.remainingMinutes - 1).coerceAtLeast(0)
-                _state.value = current.copy(
-                    remainingMinutes = remaining,
-                    elapsedMinutes = current.elapsedMinutes + 1
-                )
+                _state.value = current.copy(remainingMinutes = remaining, elapsedMinutes = current.elapsedMinutes + 1)
                 if (remaining == 0) {
-                    _state.value = _state.value.copy(
-                        isRunning = false,
-                        message = "Session beendet – bitte Foto machen!"
-                    )
+                    repo.endProductivitySession()
+                    _state.value = _state.value.copy(isRunning = false, message = "Session beendet – bitte Foto machen!")
                 }
             }
         }
@@ -74,6 +63,7 @@ class TimerViewModel(private val app: TimeWalletApp) : ViewModel() {
             _state.value = current.copy(message = "Bitte erst die laufende Session vollständig beenden.")
             return
         }
+        repo.endProductivitySession()
         timerJob.cancel()
         viewModelScope.launch {
             val bitmap = BitmapFactory.decodeFile(photoPath)
@@ -98,6 +88,7 @@ class TimerViewModel(private val app: TimeWalletApp) : ViewModel() {
     private fun calculateCoins(minutes: Int): Int = minutes + if (minutes >= 60) 10 else if (minutes >= 30) 5 else 0
 
     override fun onCleared() {
+        repo.endProductivitySession()
         timerJob.cancel()
         super.onCleared()
     }
