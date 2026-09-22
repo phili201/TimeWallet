@@ -74,22 +74,26 @@ class SocialBlockerService : AccessibilityService() {
         val windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
         val view = LayoutInflater.from(this).inflate(R.layout.blocker_overlay, null)
 
-        // Keep the overlay active. Removing it on a tap would make the blocker
-        // immediately bypassable.
         view.contentDescription = when (packageName) {
             "com.instagram.android" -> "Instagram ist blockiert"
             "com.google.android.youtube" -> "YouTube ist blockiert"
             else -> "App ist blockiert"
         }
 
+        // Accessibility services should use TYPE_ACCESSIBILITY_OVERLAY. This is
+        // attached to the accessibility service itself and avoids relying on the
+        // separate SYSTEM_ALERT_WINDOW permission.
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.MATCH_PARENT,
-            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
-                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
+            WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
+            WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
+                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
             PixelFormat.TRANSLUCENT
         )
+
+        // Consume every touch so the blocked app underneath cannot be used.
+        view.setOnTouchListener { _, _ -> true }
 
         try {
             windowManager.addView(view, params)
