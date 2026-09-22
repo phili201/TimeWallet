@@ -26,6 +26,7 @@ class TimeWalletRepository(
     fun startProductivitySession() = socialStore.setProductivitySessionRunning(true)
     fun endProductivitySession() = socialStore.setProductivitySessionRunning(false)
     fun setAntiAddictionMode(enabled: Boolean) = socialStore.setAntiAddictionMode(enabled)
+    fun isAntiAddictionModeEnabled(): Boolean = socialStore.isAntiAddictionMode()
     fun isProductivitySessionRunning(): Boolean = socialStore.isProductivitySessionRunning()
     fun getSocialRemainingMinutes(): Int = socialStore.remainingMinutes()
 
@@ -42,7 +43,8 @@ class TimeWalletRepository(
     suspend fun purchaseSocialTime(minutes: Int, coinCost: Int): Boolean {
         if (minutes <= 0 || coinCost <= 0) return false
         if (coinDao.getBalanceOnce() < coinCost) return false
-        coinDao.insert(CoinEntry(-coinCost, "Social-Zeit gekauft", System.currentTimeMillis()))
+        if (socialStore.isAntiAddictionMode() && minutes > 30) return false
+        coinDao.insert(CoinEntry(amount = -coinCost, reason = "Social-Zeit gekauft", timestamp = System.currentTimeMillis()))
         socialStore.purchaseMinutes(minutes)
         return true
     }
