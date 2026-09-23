@@ -19,6 +19,7 @@ class TimeWalletRepository(
 
     fun getCoinHistory(): Flow<List<CoinEntry>> = coinDao.getHistory()
     fun getCoinBalance(): Flow<Int> = coinDao.getBalance()
+    suspend fun getCoinBalanceSnapshot(): Int = coinDao.getBalanceOnce()
     fun getSessionHistory(): Flow<List<SessionEntry>> = sessionDao.getSessions()
     suspend fun insertCoin(entry: CoinEntry) = coinDao.insert(entry)
     suspend fun insertSession(entry: SessionEntry) = sessionDao.insert(entry)
@@ -29,7 +30,6 @@ class TimeWalletRepository(
     fun isAntiAddictionModeEnabled(): Boolean = socialStore.isAntiAddictionMode()
     fun isProductivitySessionRunning(): Boolean = socialStore.isProductivitySessionRunning()
     fun getSocialRemainingMinutes(): Int = socialStore.remainingMinutes()
-
     fun startSocialUse() = socialStore.startSocialUse()
     fun stopSocialUse() = socialStore.stopSocialUse()
 
@@ -44,11 +44,28 @@ class TimeWalletRepository(
 
     suspend fun purchaseSocialTime(minutes: Int, coinCost: Int): Boolean {
         if (minutes <= 0 || coinCost <= 0) return false
+        if (socialStore.isAntiAddictionMode() &&
+            socialStore.purchasedRemainingMs() + minutes * 60_000L > 30 * 60_000L
+        ) {
+            return false
+        }
+
         if (coinDao.getBalanceOnce() < coinCost) return false
-        if (socialStore.isAntiAddictionMode() && minutes > 30) return false
         if (!socialStore.purchaseMinutes(minutes)) return false
-        coinDao.insert(CoinEntry(amount = -coinCost, reason = "Social-Zeit gekauft", timestamp = System.currentTimeMillis()))
-        return true
+
+        return try {
+            coinDao.insert(
+                CoinEntry(
+                    amount = -coinCost,
+                    reason = "Social-Zeit gekauft",
+                    timestamp = System.currentTimeMillis()
+                )
+            )
+            true
+        } catch (exception: Exception) {
+            socialStore.removePurchasedMinutes(minutes)
+            false
+        }
     }
 
     fun isAppAlive(): Boolean = true
