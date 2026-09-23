@@ -25,7 +25,7 @@
 
     <Button
         android:id="@+id/imprintButton"
-        android:text="Impressum"
+        android:text="Haftungsausschluss"
         android:layout_marginTop="12dp"
         android:layout_width="match_parent"
         android:layout_height="60dp"
