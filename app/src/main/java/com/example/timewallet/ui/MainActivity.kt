@@ -49,6 +49,13 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (::content.isInitialized && ::nav.isInitialized) {
+            showPage(selected)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.statusBarColor = bg
@@ -121,7 +128,32 @@ class MainActivity : ComponentActivity() {
         content.addView(button("Session starten") { viewModel.startSession(taskInput.text.toString().ifBlank { "Allgemein" }, duration.text.toString().toIntOrNull() ?: 25) })
         content.addView(button("Foto zur Bestätigung aufnehmen") { cameraLauncher.launch(Intent(this, CameraActivity::class.java)) })
         content.addView(tv("Deine Produktivität", 19, text, true).apply { setPadding(0, dp(18), 0, dp(8)) })
-        val status = card(); status.addView(tv("🛡  Fokus schützt deine Zeit", 16, text, true)); status.addView(tv("Während einer Session bleiben Instagram und YouTube gesperrt – auch wenn Social-Zeit gekauft wurde.", 13, secondary, false).apply { setPadding(0, dp(6), 0, 0) }); content.addView(status)
+        val status = card()
+        status.addView(tv("🛡  Fokus schützt deine Zeit", 16, text, true))
+        val blockerEnabled = isAccessibilityServiceEnabled()
+        status.addView(
+            tv(
+                if (blockerEnabled) "🟢 Social-Blocker aktiv"
+                else "🔴 Social-Blocker noch nicht aktiviert",
+                13,
+                if (blockerEnabled) Color.rgb(80, 220, 140) else Color.rgb(255, 110, 110),
+                true
+            ).apply { setPadding(0, dp(6), 0, 0) }
+        )
+        status.addView(
+            tv(
+                "Während einer Session bleiben Instagram und YouTube gesperrt – auch wenn Social-Zeit gekauft wurde.",
+                13,
+                secondary,
+                false
+            ).apply { setPadding(0, dp(4), 0, 0) }
+        )
+        if (!blockerEnabled) {
+            status.addView(button("Blocker jetzt einrichten") {
+                startActivity(Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS))
+            })
+        }
+        content.addView(status)
     }
 
     private fun tasksPage() {
