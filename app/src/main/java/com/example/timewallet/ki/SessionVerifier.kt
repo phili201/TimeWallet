@@ -30,7 +30,7 @@ class SessionVerifier {
         } finally { labeler.close() }
     }
 
-    suspend fun calculateScore(bitmap: Bitmap): ProductivityScore {
+    suspend fun calculateScore(bitmap: Bitmap, task: String = ""): ProductivityScore {
         if (bitmap.width < 200 || bitmap.height < 200)
             return ProductivityScore(0, "Bild ist zu klein")
 
@@ -44,6 +44,20 @@ class SessionVerifier {
         val matches = labels.intersect(productive)
         if (matches.isNotEmpty()) { score += 45; reasons += "Arbeitsumgebung erkannt (${matches.take(3).joinToString()})" }
         else reasons += "Keine typische Arbeitsumgebung erkannt"
+
+        val taskLower = task.lowercase()
+        val taskKeywords = when {
+            "vokabel" in taskLower || "lesen" in taskLower -> setOf("book", "notebook", "paper", "document")
+            "coden" in taskLower || "programm" in taskLower -> setOf("laptop", "computer", "keyboard", "workstation")
+            "schule" in taskLower || "mathe" in taskLower -> setOf("book", "notebook", "paper", "document", "calculator")
+            else -> emptySet()
+        }
+        if (taskKeywords.isNotEmpty() && labels.intersect(taskKeywords).isNotEmpty()) {
+            score += 10
+            reasons += "Aufgabe passend zum Bild"
+        } else if (taskKeywords.isNotEmpty()) {
+            reasons += "Aufgabe nicht eindeutig im Bild erkennbar"
+        }
 
         val center = bitmap.getPixel(bitmap.width / 2, bitmap.height / 2)
         val brightness = ((center shr 16 and 0xFF) + (center shr 8 and 0xFF) + (center and 0xFF)) / 3
