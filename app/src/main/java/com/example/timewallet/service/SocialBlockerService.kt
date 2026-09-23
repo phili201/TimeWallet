@@ -59,7 +59,7 @@ class SocialBlockerService : AccessibilityService() {
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         val eventPackage = event?.packageName?.toString()
 
-        if (eventPackage in blockedPackages) {
+        if (eventPackage != null && eventPackage in blockedPackages) {
             currentBlockedPackage = eventPackage
             enforceForeground(eventPackage)
             return
