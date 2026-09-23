@@ -1,8 +1,11 @@
 package com.example.timewallet.ui.block
 
+import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import com.example.timewallet.databinding.ActivityBlockScreenBinding
+import com.example.timewallet.ui.MainActivity
 
 class BlockScreenActivity : ComponentActivity() {
     companion object {
@@ -14,19 +17,38 @@ class BlockScreenActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.navigationBarColor = 0xFF0D0D0D.toInt()
-        window.statusBarColor = 0xFF0D0D0D.toInt()
+
+        window.statusBarColor = Color.rgb(5, 7, 10)
+        window.navigationBarColor = Color.rgb(5, 7, 10)
+
         binding = ActivityBlockScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         val pkg = intent.getStringExtra(EXTRA_BLOCKED_PACKAGE).orEmpty()
-        val reason = intent.getStringExtra(EXTRA_REASON)
+        val reason = intent.getStringExtra(EXTRA_REASON).orEmpty()
+
         binding.blockCountdown.text = when (pkg) {
             "com.instagram.android" -> "Instagram ist blockiert"
             "com.google.android.youtube" -> "YouTube ist blockiert"
             else -> "Zugang blockiert"
         }
-        binding.blockReason.text = reason ?: "Produktivität zuerst."
-        binding.backButton.setOnClickListener { finishAndRemoveTask() }
+
+        binding.blockReason.text = reason.ifBlank { "Produktivität zuerst." }
+
+        binding.backButton.setOnClickListener {
+            openWallet()
+        }
+    }
+
+    override fun onBackPressed() {
+        openWallet()
+    }
+
+    private fun openWallet() {
+        startActivity(
+            Intent(this, MainActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        )
+        finishAndRemoveTask()
     }
 }
