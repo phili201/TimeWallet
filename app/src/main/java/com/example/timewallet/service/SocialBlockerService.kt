@@ -60,7 +60,10 @@ class SocialBlockerService : AccessibilityService() {
     }
 
     private fun enforceCurrentForegroundApp() {
-        val activePackage = rootInActiveWindow?.packageName?.toString() ?: currentBlockedPackage
+        val activePackage = rootInActiveWindow?.packageName?.toString()
+            ?: currentBlockedPackage
+            ?: return
+
         if (activePackage !in blockedPackages) {
             stopSocialUse()
             currentBlockedPackage = null
@@ -87,27 +90,32 @@ class SocialBlockerService : AccessibilityService() {
         if (overlayView != null) return
         val windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
         val view = LayoutInflater.from(this).inflate(R.layout.blocker_overlay, null)
+
         view.contentDescription = when (packageName) {
             "com.instagram.android" -> "Instagram ist blockiert"
             "com.google.android.youtube" -> "YouTube ist blockiert"
             else -> "App ist blockiert"
         }
+
         view.findViewById<View>(R.id.openWalletButton)?.setOnClickListener {
             startActivity(
                 android.content.Intent(this, com.example.timewallet.ui.MainActivity::class.java)
                     .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
             )
         }
+
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
             WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
-                WindowManager.LayoutParams.FLAG_LAYOUT_STABLE,
+                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
             PixelFormat.TRANSLUCENT
         )
+
         view.isClickable = true
         view.isFocusable = true
+
         runCatching {
             windowManager.addView(view, params)
             overlayView = view
