@@ -18,6 +18,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.MainActivity" android:exported="false" />
+        <activity
+            android:name=".ui.block.BlockScreenActivity"
+            android:exported="false"
+            android:excludeFromRecents="true" />
         <activity android:name=".ui.history.CoinHistoryActivity" android:exported="false" />
         <activity android:name=".ui.legal.LegalActivity" android:exported="false" />
         <activity android:name=".ui.legal.LegalViewerActivity" android:exported="false" />
