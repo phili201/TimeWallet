@@ -146,7 +146,56 @@ class MainActivity : ComponentActivity() {
         header("Persönlich", "Profil & Einstellungen", false)
         val prefs = getSharedPreferences("profile", MODE_PRIVATE)
         val c = card(); c.addView(tv("Dein Profil", 18, text, true)); val name = EditText(this).apply { hint = "Dein Name"; setText(prefs.getString("name", "")); setTextColor(this@MainActivity.text); setHintTextColor(secondary); setSingleLine() }; c.addView(name); c.addView(button("Profil speichern") { prefs.edit().putString("name", name.text.toString().trim()).apply(); Toast.makeText(this, "Profil gespeichert", Toast.LENGTH_SHORT).show() }); content.addView(c)
-        val security = card(); security.addView(tv("Sicherheit & Anti-Sucht", 18, text, true)); val anti = SwitchMaterial(this).apply { text = "Anti-Sucht-Modus"; isChecked = app.repository.isAntiAddictionModeEnabled(); setTextColor(this@MainActivity.text); setOnCheckedChangeListener { _, checked -> app.repository.setAntiAddictionMode(checked) } }; security.addView(anti); val emergency = SwitchMaterial(this).apply { text = "Notfall-Switch aktiv"; isChecked = app.repository.isEmergencySwitchEnabled(); setTextColor(this@MainActivity.text); setOnCheckedChangeListener { _, checked -> app.repository.setEmergencySwitchEnabled(checked) } }; security.addView(emergency); security.addView(tv("Der Notfall-Switch ist eine Sicherheitsausstiegsmöglichkeit und darf nie zum dauerhaften Aussperren vom eigenen Gerät führen.", 12, secondary, false).apply { setPadding(0, dp(8), 0, 0) }); content.addView(security)
+        val blocker = card()
+        val blockerEnabled = isAccessibilityServiceEnabled()
+        blocker.addView(tv("Social-Blocker", 18, text, true))
+        blocker.addView(
+            tv(
+                if (blockerEnabled) "🟢 Aktiv • Instagram und YouTube werden überwacht"
+                else "🔴 Nicht aktiviert • Der Blocker kann noch nicht eingreifen",
+                14,
+                if (blockerEnabled) Color.rgb(80, 220, 140) else Color.rgb(255, 110, 110),
+                true
+            ).apply { setPadding(0, dp(8), 0, 0) }
+        )
+        blocker.addView(
+            tv(
+                "TimeWallet braucht dafür den Android-Zugriff „Bedienungshilfen“. Das ist keine normale App-Berechtigung und muss einmal in den Systemeinstellungen aktiviert werden.",
+                12,
+                secondary,
+                false
+            ).apply { setPadding(0, dp(6), 0, 0) }
+        )
+        blocker.addView(button("Accessibility-Einstellungen öffnen") {
+            startActivity(Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS))
+        })
+        content.addView(blocker)
+
+        val security = card()
+        security.addView(tv("Sicherheit & Anti-Sucht", 18, text, true))
+        val anti = SwitchMaterial(this).apply {
+            text = "Anti-Sucht-Modus"
+            isChecked = app.repository.isAntiAddictionModeEnabled()
+            setTextColor(this@MainActivity.text)
+            setOnCheckedChangeListener { _, checked -> app.repository.setAntiAddictionMode(checked) }
+        }
+        security.addView(anti)
+        val emergency = SwitchMaterial(this).apply {
+            text = "Notfall-Switch aktiv"
+            isChecked = app.repository.isEmergencySwitchEnabled()
+            setTextColor(this@MainActivity.text)
+            setOnCheckedChangeListener { _, checked -> app.repository.setEmergencySwitchEnabled(checked) }
+        }
+        security.addView(emergency)
+        security.addView(
+            tv(
+                "Der Notfall-Switch ist eine Sicherheitsausstiegsmöglichkeit und darf nie zum dauerhaften Aussperren vom eigenen Gerät führen.",
+                12,
+                secondary,
+                false
+            ).apply { setPadding(0, dp(8), 0, 0) }
+        )
+        content.addView(security)
         content.addView(button("Rechtliches") { startActivity(Intent(this, com.example.timewallet.ui.legal.LegalActivity::class.java)) })
         content.addView(tv("TimeWallet 1.0 • Material 3 Dark", 12, secondary, false).apply { gravity = Gravity.CENTER; setPadding(0, dp(20), 0, dp(20)) })
     }
