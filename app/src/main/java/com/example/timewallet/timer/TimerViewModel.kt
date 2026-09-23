@@ -165,13 +165,17 @@ class TimerViewModel(private val app: TimeWalletApp) : ViewModel() {
         timerJob?.cancel()
         viewModelScope.launch {
             try {
-                val bitmap = BitmapFactory.decodeFile(photoPath)
+                val bitmap = decodeSampledBitmap(photoPath)
+                    ?: run {
+                        _state.value = _state.value.copy(message = "Foto konnte nicht gelesen werden. Bitte erneut aufnehmen.")
+                        return@launch
+                    }
                 if (bitmap == null) {
                     _state.value = _state.value.copy(message = "Foto konnte nicht gelesen werden. Bitte erneut aufnehmen.")
                     return@launch
                 }
 
-                val result = SessionVerifier().calculateScore(bitmap)
+                val result = SessionVerifier().calculateScore(bitmap, _state.value.currentTask)
                 bitmap.recycle()
                 val minutes = _state.value.sessionMinutes
                 val task = _state.value.currentTask
@@ -248,6 +252,22 @@ class TimerViewModel(private val app: TimeWalletApp) : ViewModel() {
 
     private fun calculateCoins(minutes: Int): Int =
         minutes + if (minutes >= 60) 10 else if (minutes >= 30) 5 else 0
+
+    private fun decodeSampledBitmap(path: String, maxDimension: Int = 1280): android.graphics.Bitmap? {
+        val bounds = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        BitmapFactory.decodeFile(path, bounds)
+        if (bounds.outWidth <= 0 || bounds.outHeight <= 0) return null
+
+        var sample = 1
+        while (bounds.outWidth / sample > maxDimension || bounds.outHeight / sample > maxDimension) {
+            sample *= 2
+        }
+
+        return BitmapFactory.decodeFile(path, android.graphics.BitmapFactory.Options().apply {
+            inSampleSize = sample
+            inPreferredConfig = android.graphics.Bitmap.Config.RGB_565
+        })
+    }
 
     private fun clearPersistedSession() {
         prefs.edit().clear().apply()
