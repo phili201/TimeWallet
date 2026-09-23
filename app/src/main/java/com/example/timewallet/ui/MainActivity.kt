@@ -67,6 +67,11 @@ class MainActivity : ComponentActivity() {
             }
         }
         showPage(0)
+        val initialTask = intent.getStringExtra(EXTRA_TASK)
+        val initialMinutes = intent.getIntExtra(EXTRA_MINUTES, 0)
+        if (!initialTask.isNullOrBlank() && initialMinutes > 0 && savedInstanceState == null) {
+            viewModel.startSession(initialTask, initialMinutes.coerceIn(1, 180))
+        }
     }
 
     private fun buildShell() {
@@ -157,6 +162,23 @@ class MainActivity : ComponentActivity() {
     private fun tv(value: String, size: Int, color: Int, bold: Boolean): TextView = TextView(this).apply { text = value; textSize = size.toFloat(); setTextColor(color); if (bold) typeface = android.graphics.Typeface.DEFAULT_BOLD }
     private fun rounded(color: Int, radius: Int) = GradientDrawable().apply { setColor(color); cornerRadius = dp(radius).toFloat() }
     private fun lp(w: Int, margin: Int) = LinearLayout.LayoutParams(if (w == 1) -1 else w, -2).apply { topMargin = dp(margin) }
+    private fun isAccessibilityServiceEnabled(): Boolean {
+        val enabled = android.provider.Settings.Secure.getString(
+            contentResolver,
+            android.provider.Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
+        ) ?: return false
+        val expected = android.content.ComponentName(
+            this,
+            com.example.timewallet.service.SocialBlockerService::class.java
+        )
+        return enabled.split(':').any { android.content.ComponentName.unflattenFromString(it) == expected }
+    }
+
+    companion object {
+        const val EXTRA_TASK = "task"
+        const val EXTRA_MINUTES = "minutes"
+    }
+
     private fun dp(v: Int) = (v * resources.displayMetrics.density).toInt()
     private val Int.dp get() = dp(this)
 }
