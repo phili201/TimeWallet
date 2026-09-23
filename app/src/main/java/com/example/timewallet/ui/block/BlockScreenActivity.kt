@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
 import com.example.timewallet.databinding.ActivityBlockScreenBinding
 import com.example.timewallet.ui.MainActivity
 
@@ -38,10 +39,15 @@ class BlockScreenActivity : ComponentActivity() {
         binding.backButton.setOnClickListener {
             openWallet()
         }
-    }
 
-    override fun onBackPressed() {
-        openWallet()
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    openWallet()
+                }
+            }
+        )
     }
 
     private fun openWallet() {
