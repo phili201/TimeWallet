@@ -213,13 +213,17 @@ class TimerViewModel(private val app: TimeWalletApp) : ViewModel() {
                     )
                 } else {
                     repo.endProductivitySession()
-                    repo.insertCoin(
-                        CoinEntry(
-                            amount = -5,
-                            reason = "Ungültige Session / Strafe",
-                            timestamp = System.currentTimeMillis()
+                    val availableCoins = repo.getCoinBalanceSnapshot()
+                    val penalty = minOf(5, availableCoins)
+                    if (penalty > 0) {
+                        repo.insertCoin(
+                            CoinEntry(
+                                amount = -penalty,
+                                reason = "Ungültige Session / Strafe",
+                                timestamp = System.currentTimeMillis()
+                            )
                         )
-                    )
+                    }
                     clearPersistedSession()
                     _state.value = _state.value.copy(
                         isRunning = false,
@@ -229,7 +233,11 @@ class TimerViewModel(private val app: TimeWalletApp) : ViewModel() {
                         elapsedMinutes = minutes,
                         elapsedSeconds = minutes * 60,
                         currentTask = "",
-                        message = "Session abgelehnt ❌ Score: ${result.score}. -5 Coins"
+                        message = if (penalty > 0) {
+                            "Session abgelehnt ❌ Score: ${result.score}. -$penalty Coins"
+                        } else {
+                            "Session abgelehnt ❌ Score: ${result.score}. Keine Coins vorhanden."
+                        }
                     )
                 }
             } catch (exception: Exception) {
