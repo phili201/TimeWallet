@@ -170,11 +170,6 @@ class TimerViewModel(private val app: TimeWalletApp) : ViewModel() {
                         _state.value = _state.value.copy(message = "Foto konnte nicht gelesen werden. Bitte erneut aufnehmen.")
                         return@launch
                     }
-                if (bitmap == null) {
-                    _state.value = _state.value.copy(message = "Foto konnte nicht gelesen werden. Bitte erneut aufnehmen.")
-                    return@launch
-                }
-
                 val result = SessionVerifier().calculateScore(bitmap, _state.value.currentTask)
                 bitmap.recycle()
                 val minutes = _state.value.sessionMinutes
