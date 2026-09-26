@@ -1,0 +1,27 @@
+TIMEWALLET – ALLGEMEINE GESCHÄFTSBEDINGUNGEN (ENTWURF)
+
+Diese Datei ist ein technischer Entwurf und keine Rechtsberatung. Vor einer Veröffentlichung müssen Betreiberangaben, Leistungsumfang, Haftungsregelungen, Datenschutz, Widerrufs-/Verbraucherinformationen soweit erforderlich und anwendbares Recht durch eine geeignete Rechtsberatung geprüft und angepasst werden.
+
+1. Geltungsbereich
+TimeWallet ist eine Produktivitäts- und Zeitverwaltungs-App. Funktionen können sich während der Entwicklung ändern.
+
+2. Nutzerkonto
+Für Online-Funktionen ist ein Konto erforderlich. Zugangsdaten sind vertraulich zu behandeln.
+
+3. Coins und Zeit
+Coins sind ausschließlich ein virtuelles Funktionsguthaben innerhalb von TimeWallet. Sie sind nicht als Geld, Zahlungsmittel oder auszahlbarer Vermögenswert gedacht.
+
+4. Blocking
+Blocking nutzt Android-Systemfunktionen. Eine absolute technische Unumgehbarkeit kann nicht garantiert werden.
+
+5. Nachweisprüfung
+Automatische Bild-/Dateiprüfungen sind technische Hilfen und können fehlerhafte Ergebnisse liefern.
+
+6. Änderungen und Beendigung
+Der Betreiber kann Funktionen aus Sicherheits-, Wartungs- oder Kompatibilitätsgründen ändern oder deaktivieren.
+
+7. Datenschutz
+Die Verarbeitung personenbezogener Daten erfolgt nach der jeweils veröffentlichten Datenschutzerklärung.
+
+8. Rechtlicher Hinweis
+Dies ist ein Entwicklungsentwurf und darf nicht unverändert als endgültige AGB veröffentlicht werden.
