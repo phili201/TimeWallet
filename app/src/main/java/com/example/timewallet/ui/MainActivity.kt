@@ -23,13 +23,12 @@ class MainActivity : FragmentActivity() {
     private lateinit var wallet: TextView
     private lateinit var social: TextView
     private lateinit var session: TextView
-    private lateinit var sessionCard: LinearLayout
     private lateinit var executor: Executor
 
     private val bg = Color.rgb(10, 12, 16)
     private val card = Color.rgb(21, 24, 30)
     private val card2 = Color.rgb(28, 32, 40)
-    private val text = Color.WHITE
+    private val paletteText = Color.WHITE
     private val muted = Color.rgb(164, 171, 184)
     private val accent = Color.rgb(110, 231, 183)
 
@@ -48,86 +47,39 @@ class MainActivity : FragmentActivity() {
 
     private fun build() {
         val scroll = ScrollView(this).apply { setBackgroundColor(bg) }
-        val root = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(22, 24, 22, 28)
-        }
+        val root = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(22, 24, 22, 28) }
         scroll.addView(root)
         setContentView(scroll)
 
         val header = LinearLayout(this).apply { gravity = Gravity.CENTER_VERTICAL }
-        val brand = TextView(this).apply {
-            text = "timewallet"
-            textSize = 25f
-            typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-            setTextColor(text)
-        }
+        val brand = TextView(this).apply { text = "timewallet"; textSize = 25f; typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD); setTextColor(paletteText) }
         header.addView(brand, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
-        val profile = pill("●  ${if (app.supabase.isLoggedIn()) "Online" else "Offline"}", if (app.supabase.isLoggedIn()) accent else muted)
-        header.addView(profile)
-        root.addView(header)
-        root.addView(space(18))
-
-        val greeting = TextView(this).apply {
-            text = "Deine Zeit, bewusst genutzt."
-            textSize = 16f
-            setTextColor(muted)
-        }
-        root.addView(greeting)
+        header.addView(pill("●  ${if (app.supabase.isLoggedIn()) "Online" else "Offline"}", if (app.supabase.isLoggedIn()) accent else muted))
+        root.addView(header); root.addView(space(18))
+        root.addView(TextView(this).apply { text = "Deine Zeit, bewusst genutzt."; textSize = 16f; setTextColor(muted) })
         root.addView(space(10))
 
         val walletCard = cardView()
-        val walletTitle = label("WALLET", muted, 12f)
-        walletCard.addView(walletTitle)
-        wallet = TextView(this).apply {
-            textSize = 42f
-            typeface = Typeface.DEFAULT_BOLD
-            setTextColor(text)
-        }
-        walletCard.addView(wallet)
-        walletCard.addView(space(4))
-        val walletHint = label("Coins werden durch produktive Aufgaben verdient.", muted, 13f)
-        walletCard.addView(walletHint)
-        root.addView(walletCard)
-        root.addView(space(12))
+        walletCard.addView(label("WALLET", muted, 12f))
+        wallet = TextView(this).apply { textSize = 42f; typeface = Typeface.DEFAULT_BOLD; setTextColor(paletteText) }
+        walletCard.addView(wallet); walletCard.addView(space(4)); walletCard.addView(label("Coins werden durch produktive Aufgaben verdient.", muted, 13f))
+        root.addView(walletCard); root.addView(space(12))
 
         val socialCard = cardView()
         socialCard.addView(label("VERFÜGBARE SOCIAL-ZEIT", muted, 12f))
-        social = TextView(this).apply {
-            textSize = 31f
-            typeface = Typeface.DEFAULT_BOLD
-            setTextColor(text)
-        }
-        socialCard.addView(social)
-        socialCard.addView(space(4))
-        socialCard.addView(label("2 Coins = 1 Minute", muted, 13f))
-        root.addView(socialCard)
-        root.addView(space(14))
+        social = TextView(this).apply { textSize = 31f; typeface = Typeface.DEFAULT_BOLD; setTextColor(paletteText) }
+        socialCard.addView(social); socialCard.addView(space(4)); socialCard.addView(label("2 Coins = 1 Minute", muted, 13f))
+        root.addView(socialCard); root.addView(space(14))
+        root.addView(actionButton("Zeit kaufen") { buyDialog() }); root.addView(space(9))
+        root.addView(secondaryButton("＋  Produktive Aufgabe") { startActivity(Intent(this, EvidenceActivity::class.java)) }); root.addView(space(18))
 
-        val primary = actionButton("Zeit kaufen") { buyDialog() }
-        root.addView(primary)
-        root.addView(space(9))
-        val taskButton = secondaryButton("＋  Produktive Aufgabe") { startActivity(Intent(this, EvidenceActivity::class.java)) }
-        root.addView(taskButton)
-        root.addView(space(18))
-
-        sessionCard = cardView()
+        val sessionCard = cardView()
         sessionCard.addView(label("FOKUS", muted, 12f))
-        session = TextView(this).apply {
-            textSize = 18f
-            typeface = Typeface.DEFAULT_BOLD
-            setTextColor(text)
-        }
-        sessionCard.addView(session)
-        sessionCard.addView(space(12))
-        val sessionAction = secondaryButton("Session starten") { sessionDialog() }
-        sessionCard.addView(sessionAction)
-        root.addView(sessionCard)
-        root.addView(space(18))
+        session = TextView(this).apply { textSize = 18f; typeface = Typeface.DEFAULT_BOLD; setTextColor(paletteText) }
+        sessionCard.addView(session); sessionCard.addView(space(12)); sessionCard.addView(secondaryButton("Session starten") { sessionDialog() })
+        root.addView(sessionCard); root.addView(space(18))
 
-        val section = label("DEIN TIMEWALLET", muted, 12f)
-        root.addView(section)
-        root.addView(space(8))
+        root.addView(label("DEIN TIMEWALLET", muted, 12f)); root.addView(space(8))
         root.addView(menuRow("▣", "Aufgaben & Nachweise", "Produktivität in Coins umwandeln") { startActivity(Intent(this, EvidenceActivity::class.java)) })
         root.addView(menuRow("◉", "Apps & Sperren", "Social Media und Spiele verwalten") { appPicker() })
         root.addView(menuRow("◷", "Nutzungsdaten", "Android Usage Access aktivieren") { startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)) })
@@ -141,86 +93,43 @@ class MainActivity : FragmentActivity() {
         repo.tickSocialUse()
         wallet.text = "${repo.coins()} Coins"
         social.text = formatTime(repo.socialSeconds())
-        if (repo.isProductivitySessionRunning()) {
-            session.text = "Fokus aktiv  •  ${repo.currentTask()}\nNoch ${formatTime(repo.remainingSessionSeconds())}"
-        } else {
-            session.text = "Bereit für deine nächste Fokus-Session"
-        }
+        session.text = if (repo.isProductivitySessionRunning()) "Fokus aktiv  •  ${repo.currentTask()}\nNoch ${formatTime(repo.remainingSessionSeconds())}" else "Bereit für deine nächste Fokus-Session"
     }
 
     private fun formatTime(seconds: Long): String {
         val s = seconds.coerceAtLeast(0)
-        return if (s >= 3600) String.format("%dh %02dm", s / 3600, (s % 3600) / 60)
-        else String.format("%02dm %02ds", s / 60, s % 60)
+        return if (s >= 3600) String.format("%dh %02dm", s / 3600, (s % 3600) / 60) else String.format("%02dm %02ds", s / 60, s % 60)
     }
 
-    private fun cardView(): LinearLayout = LinearLayout(this).apply {
-        orientation = LinearLayout.VERTICAL
-        setPadding(20, 18, 20, 18)
-        setBackgroundColor(card)
-    }.also { it.layoutParams = LinearLayout.LayoutParams(-1, ViewGroup.LayoutParams.WRAP_CONTENT) }
+    private fun cardView() = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(20, 18, 20, 18); setBackgroundColor(card); layoutParams = LinearLayout.LayoutParams(-1, ViewGroup.LayoutParams.WRAP_CONTENT) }
 
     private fun menuRow(icon: String, title: String, sub: String, action: () -> Unit): View {
-        val row = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
-            setPadding(14, 14, 14, 14)
-            setBackgroundColor(card)
-            setOnClickListener { action() }
-        }
-        val iconView = TextView(this).apply { text = icon; textSize = 21f; setTextColor(accent); gravity = Gravity.CENTER }
-        row.addView(iconView, LinearLayout.LayoutParams(42, 60))
+        val row = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL; setPadding(14, 14, 14, 14); setBackgroundColor(card); setOnClickListener { action() } }
+        row.addView(TextView(this).apply { text = icon; textSize = 21f; setTextColor(accent); gravity = Gravity.CENTER }, LinearLayout.LayoutParams(42, 60))
         val box = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(8, 0, 0, 0) }
-        box.addView(label(title, text, 16f, true))
-        box.addView(label(sub, muted, 12f))
-        row.addView(box, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
-        val arrow = label("›", muted, 26f)
-        row.addView(arrow, LinearLayout.LayoutParams(30, ViewGroup.LayoutParams.WRAP_CONTENT))
+        box.addView(label(title, paletteText, 16f, true)); box.addView(label(sub, muted, 12f)); row.addView(box, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)); row.addView(label("›", muted, 26f), LinearLayout.LayoutParams(30, ViewGroup.LayoutParams.WRAP_CONTENT))
         return row
     }
 
-    private fun label(value: String, color: Int, size: Float, bold: Boolean = false) = TextView(this).apply {
-        text = value; textSize = size; setTextColor(color)
-        if (bold) typeface = Typeface.DEFAULT_BOLD
-    }
-
-    private fun pill(value: String, color: Int) = TextView(this).apply {
-        text = value; textSize = 12f; setTextColor(color); setPadding(12, 7, 12, 7)
-    }
-
-    private fun actionButton(value: String, action: () -> Unit) = Button(this).apply {
-        text = value; textSize = 16f; typeface = Typeface.DEFAULT_BOLD; setTextColor(Color.rgb(8, 12, 14)); setBackgroundColor(accent); setOnClickListener { action() }
-        layoutParams = LinearLayout.LayoutParams(-1, 58)
-    }
-
-    private fun secondaryButton(value: String, action: () -> Unit) = Button(this).apply {
-        text = value; textSize = 14f; setTextColor(text); setBackgroundColor(card2); setOnClickListener { action() }
-        layoutParams = LinearLayout.LayoutParams(-1, 52)
-    }
-
+    private fun label(value: String, color: Int, size: Float, bold: Boolean = false) = TextView(this).apply { text = value; textSize = size; setTextColor(color); if (bold) typeface = Typeface.DEFAULT_BOLD }
+    private fun pill(value: String, color: Int) = TextView(this).apply { text = value; textSize = 12f; setTextColor(color); setPadding(12, 7, 12, 7) }
+    private fun actionButton(value: String, action: () -> Unit) = Button(this).apply { text = value; textSize = 16f; typeface = Typeface.DEFAULT_BOLD; setTextColor(Color.rgb(8, 12, 14)); setBackgroundColor(accent); setOnClickListener { action() }; layoutParams = LinearLayout.LayoutParams(-1, 58) }
+    private fun secondaryButton(value: String, action: () -> Unit) = Button(this).apply { text = value; textSize = 14f; setTextColor(paletteText); setBackgroundColor(card2); setOnClickListener { action() }; layoutParams = LinearLayout.LayoutParams(-1, 52) }
     private fun space(px: Int) = Space(this).apply { layoutParams = LinearLayout.LayoutParams(1, px) }
 
     private fun accountDialog() {
         val box = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(8, 0, 8, 0) }
-        val e = EditText(this).apply { hint = "E-Mail" }; val p = EditText(this).apply { hint = "Passwort"; inputType = 129 }
-        box.addView(e); box.addView(p)
-        AlertDialog.Builder(this).setTitle("Konto").setView(box)
-            .setPositiveButton("Login") { _, _ -> app.supabase.signIn(e.text.toString(), p.text.toString()) { _, msg -> runOnUiThread { toast(msg); refresh() } } }
-            .setNeutralButton("Registrieren") { _, _ -> app.supabase.signUp(e.text.toString(), p.text.toString()) { _, msg -> runOnUiThread { toast(msg) } } }
-            .setNegativeButton("Passwort vergessen") { _, _ -> app.supabase.resetPassword(e.text.toString()) { _, msg -> runOnUiThread { toast(msg) } } }.show()
+        val e = EditText(this).apply { hint = "E-Mail" }; val p = EditText(this).apply { hint = "Passwort"; inputType = 129 }; box.addView(e); box.addView(p)
+        AlertDialog.Builder(this).setTitle("Konto").setView(box).setPositiveButton("Login") { _, _ -> app.supabase.signIn(e.text.toString(), p.text.toString()) { _, msg -> runOnUiThread { toast(msg); refresh() } } }.setNeutralButton("Registrieren") { _, _ -> app.supabase.signUp(e.text.toString(), p.text.toString()) { _, msg -> runOnUiThread { toast(msg) } } }.setNegativeButton("Passwort vergessen") { _, _ -> app.supabase.resetPassword(e.text.toString()) { _, msg -> runOnUiThread { toast(msg) } } }.show()
     }
 
     private fun appPicker() {
-        val apps = installedLaunchableApps(this); val selected = repo.blockedPackages().toMutableSet()
-        val labels = apps.map { it.label }.toTypedArray(); val checked = apps.map { selected.contains(it.packageName) }.toBooleanArray()
-        AlertDialog.Builder(this).setTitle("Apps sperren").setMultiChoiceItems(labels, checked) { _, i, yes -> if (yes) selected.add(apps[i].packageName) else selected.remove(apps[i].packageName) }
-            .setPositiveButton("Speichern") { _, _ -> repo.setBlockedPackages(selected); refresh() }.setNegativeButton("Abbrechen", null).show()
+        val apps = installedLaunchableApps(this); val selected = repo.blockedPackages().toMutableSet(); val labels = apps.map { it.label }.toTypedArray(); val checked = apps.map { selected.contains(it.packageName) }.toBooleanArray()
+        AlertDialog.Builder(this).setTitle("Apps sperren").setMultiChoiceItems(labels, checked) { _, i, yes -> if (yes) selected.add(apps[i].packageName) else selected.remove(apps[i].packageName) }.setPositiveButton("Speichern") { _, _ -> repo.setBlockedPackages(selected); refresh() }.setNegativeButton("Abbrechen", null).show()
     }
 
     private fun sessionDialog() {
-        val box = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(8, 0, 8, 0) }
-        val t = EditText(this).apply { hint = "Was möchtest du erledigen?" }; val m = EditText(this).apply { hint = "Minuten"; setText("25"); inputType = 2 }
-        box.addView(t); box.addView(m)
+        val box = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(8, 0, 8, 0) }; val t = EditText(this).apply { hint = "Was möchtest du erledigen?" }; val m = EditText(this).apply { hint = "Minuten"; setText("25"); inputType = 2 }; box.addView(t); box.addView(m)
         AlertDialog.Builder(this).setTitle("Fokus starten").setView(box).setPositiveButton("Start") { _, _ -> repo.startSession(t.text.toString().ifBlank { "Produktive Aufgabe" }, m.text.toString().toIntOrNull()?.coerceIn(1, 180) ?: 25); refresh() }.setNegativeButton("Abbrechen", null).show()
     }
 
