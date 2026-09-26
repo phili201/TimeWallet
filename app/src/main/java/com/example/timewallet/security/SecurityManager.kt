@@ -15,11 +15,18 @@ class SecurityManager(private val context: Context) {
     fun setPin(pin: String): Boolean {
         if (pin.length !in 4..8 || !pin.all(Char::isDigit)) return false
         val salt = ByteArray(32).also(SecureRandom()::nextBytes)
-        p.edit().putString("pin_salt", Base64.encodeToString(salt, Base64.NO_WRAP)).putString("pin_hash", hash(pin, salt)).apply(); return true
+        p.edit().putString("pin_salt", Base64.encodeToString(salt, Base64.NO_WRAP)).putString("pin_hash", hash(pin, salt)).apply()
+        return true
     }
     fun verifyPin(pin: String): Boolean {
         val salt = p.getString("pin_salt", null)?.let { Base64.decode(it, Base64.NO_WRAP) } ?: return false
-        return MessageDigest.isEqual(hash(pin, salt).toByteArray(), p.getString("pin_hash", "").toByteArray())
+        val storedHash = p.getString("pin_hash", null) ?: return false
+        val calculated = hash(pin, salt)
+        return MessageDigest.isEqual(calculated.toByteArray(Charsets.UTF_8), storedHash.toByteArray(Charsets.UTF_8))
     }
-    private fun hash(value: String, salt: ByteArray): String { val d=MessageDigest.getInstance("SHA-256"); d.update(salt); return Base64.encodeToString(d.digest(value.toByteArray()), Base64.NO_WRAP) }
+    private fun hash(value: String, salt: ByteArray): String {
+        val digest = MessageDigest.getInstance("SHA-256")
+        digest.update(salt)
+        return Base64.encodeToString(digest.digest(value.toByteArray(Charsets.UTF_8)), Base64.NO_WRAP)
+    }
 }
