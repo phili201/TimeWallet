@@ -2,275 +2,111 @@ package com.example.timewallet.ui
 
 import android.content.Intent
 import android.graphics.Color
-import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
+import android.provider.Settings
 import android.view.Gravity
-import android.view.View
-import android.widget.EditText
-import android.widget.LinearLayout
-import android.widget.ScrollView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.activity.ComponentActivity
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
-import androidx.lifecycle.lifecycleScope
+import androidx.core.content.ContextCompat
+import com.example.timewallet.R
 import com.example.timewallet.TimeWalletApp
-import com.example.timewallet.camera.CameraActivity
-import com.example.timewallet.timer.TimerViewModel
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.progressindicator.CircularProgressIndicator
-import com.google.android.material.switchmaterial.SwitchMaterial
-import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
-    private val app get() = application as TimeWalletApp
-    private val viewModel: TimerViewModel by viewModels { TimerViewModelFactoryCompat(app) }
-    private lateinit var content: LinearLayout
-    private lateinit var nav: LinearLayout
-    private var selected = 0
-    private var timerText: TextView? = null
-    private var timerStatus: TextView? = null
-    private var timerProgress: CircularProgressIndicator? = null
-    private var coinsText: TextView? = null
-    private var socialText: TextView? = null
-    private var messageText: TextView? = null
+    private val repo get() = (application as TimeWalletApp).repository
+    private lateinit var root: LinearLayout
+    private lateinit var status: TextView
+    private lateinit var wallet: TextView
+    private lateinit var social: TextView
 
-    private val bg = Color.rgb(5, 6, 8)
-    private val surface = Color.rgb(17, 19, 24)
-    private val surface2 = Color.rgb(24, 27, 33)
-    private val cyan = Color.rgb(0, 229, 255)
-    private val text = Color.rgb(245, 247, 250)
-    private val secondary = Color.rgb(160, 170, 184)
-
-    private val cameraLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == RESULT_OK) {
-            result.data?.getStringExtra("photoPath")?.let(viewModel::finishSession)
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        if (::content.isInitialized && ::nav.isInitialized) {
-            showPage(selected)
-        }
-    }
+    private val bg = Color.rgb(8, 10, 14)
+    private val card = Color.rgb(20, 24, 31)
+    private val white = Color.rgb(245, 247, 250)
+    private val muted = Color.rgb(160, 170, 184)
+    private val accent = Color.rgb(0, 220, 255)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.statusBarColor = bg
-        window.navigationBarColor = surface
-        buildShell()
-        lifecycleScope.launch {
-            viewModel.state.collect { state ->
-                coinsText?.text = "${state.coins} 🪙"
-                socialText?.text = if (state.isRunning) "Während Fokus gesperrt" else "${state.socialRemainingMinutes} Minuten verfügbar"
-                val totalSeconds = state.sessionMinutes * 60
-                val remaining = state.remainingSeconds.coerceAtLeast(0)
-                timerText?.text = String.format("%02d:%02d", remaining / 60, remaining % 60)
-                timerStatus?.text = if (state.isRunning) "Fokus läuft • Social Apps gesperrt" else "Bereit für Fokus"
-                timerProgress?.progress = if (totalSeconds > 0) (((state.elapsedSeconds * 100f) / totalSeconds).toInt()).coerceIn(0, 100) else 0
-                messageText?.text = state.message.orEmpty()
-            }
+        buildUi()
+        refresh()
+    }
+
+    override fun onResume() { super.onResume(); refresh() }
+
+    private fun buildUi() {
+        root = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(20, 24, 20, 20); setBackgroundColor(bg) }
+        val scroll = ScrollView(this).apply { addView(root) }
+        setContentView(scroll)
+        addText("TIMEWALLET", 14, accent, true)
+        addText("Deine Zeit. Dein Wallet.", 30, white, true)
+        addText("Produktive Aufgaben erledigen → Coins verdienen → Social-Zeit kaufen.", 14, muted, false)
+
+        val walletCard = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(22, 20, 22, 20); setBackgroundColor(card) }
+        wallet = TextView(this).apply { textSize = 34f; setTextColor(white); typeface = android.graphics.Typeface.DEFAULT_BOLD }
+        social = TextView(this).apply { textSize = 15f; setTextColor(muted); setPadding(0, 8, 0, 0) }
+        walletCard.addView(wallet); walletCard.addView(social)
+        root.addView(walletCard, LinearLayout.LayoutParams(-1, -2).apply { topMargin = 24 })
+
+        status = TextView(this).apply { textSize = 14f; setTextColor(muted); setPadding(0, 18, 0, 12) }
+        root.addView(status)
+        addButton("Produktivitäts-Session starten") { startSessionDialog() }
+        addButton("Social-Zeit kaufen") { buyDialog() }
+        addButton("Aufgaben & Coin-Werte") { taskDialog() }
+        addButton("App-Blocking einrichten") { startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)) }
+        addButton("Profil & Datenschutz") { profileDialog() }
+        addButton("Notfall-Switch") { emergencyDialog() }
+        addText("WhatsApp und Snapchat bleiben gemäß deiner Vorgabe ausgenommen. Spiele sind standardmäßig nicht als Social-Zeit freigeschaltet.", 12, muted, false)
+        addText("TimeWallet • Offline-first • lokale Nachweise • keine Werbe-/KI-API erforderlich", 11, muted, false)
+    }
+
+    private fun refresh() {
+        val s = repo.remainingSessionSeconds()
+        if (s == 0L && repo.isProductivitySessionRunning()) repo.endSession()
+        wallet.text = "${repo.coins()} 🪙"
+        social.text = "${repo.socialSeconds() / 60} Minuten Social-Zeit verfügbar"
+        status.text = if (repo.isProductivitySessionRunning()) "🛡 FOKUS AKTIV • ${repo.currentTask()} • ${repo.remainingSessionSeconds() / 60}:${String.format("%02d", repo.remainingSessionSeconds() % 60)}" else "Bereit für deine nächste produktive Aufgabe."
+    }
+
+    private fun startSessionDialog() {
+        val box = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(30, 10, 30, 0) }
+        val task = EditText(this).apply { hint = "Aufgabe, z. B. Mathe lernen" }
+        val minutes = EditText(this).apply { hint = "Dauer in Minuten"; inputType = 2; setText("25") }
+        box.addView(task); box.addView(minutes)
+        AlertDialogBuilder(this, "Produktivität", box, "Starten") {
+            repo.startSession(task.text.toString().ifBlank { "Produktive Aufgabe" }, minutes.text.toString().toIntOrNull()?.coerceIn(1, 180) ?: 25); refresh()
         }
-        showPage(0)
-        val initialTask = intent.getStringExtra(EXTRA_TASK)
-        val initialMinutes = intent.getIntExtra(EXTRA_MINUTES, 0)
-        if (!initialTask.isNullOrBlank() && initialMinutes > 0 && savedInstanceState == null) {
-            viewModel.startSession(initialTask, initialMinutes.coerceIn(1, 180))
-        }
     }
 
-    private fun buildShell() {
-        val root = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setBackgroundColor(bg) }
-        content = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(18), dp(12), dp(18), dp(12)) }
-        val scroll = ScrollView(this).apply { isFillViewport = true; addView(content) }
-        root.addView(scroll, LinearLayout.LayoutParams(-1, 0, 1f))
-        nav = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER; setPadding(6, 6, 6, 6); background = rounded(surface, 0) }
-        listOf("⌂" to "Home", "✓" to "Aufgaben", "◉" to "Wallet", "⚙" to "Profil").forEachIndexed { i, pair ->
-            val item = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; gravity = Gravity.CENTER; isClickable = true; setPadding(2, 4, 2, 4); setOnClickListener { showPage(i) } }
-            val icon = TextView(this).apply { text = pair.first; textSize = 23f; gravity = Gravity.CENTER; setTextColor(this@MainActivity.text) }
-            val label = TextView(this).apply { text = pair.second; textSize = 11f; gravity = Gravity.CENTER; setTextColor(this@MainActivity.text); setPadding(0, 2, 0, 0) }
-            item.addView(icon, LinearLayout.LayoutParams(-1, 34.dp)); item.addView(label, LinearLayout.LayoutParams(-1, 22.dp)); nav.addView(item, LinearLayout.LayoutParams(0, 66.dp, 1f))
-        }
-        root.addView(nav, LinearLayout.LayoutParams(-1, 78.dp))
-        setContentView(root)
+    private fun buyDialog() {
+        val options = arrayOf("15 Minuten • 15 Coins", "30 Minuten • 28 Coins", "60 Minuten • 50 Coins")
+        AlertDialog.Builder(this).setTitle("Social-Zeit kaufen").setItems(options) { _, which ->
+            val values = arrayOf(15 to 15, 30 to 28, 60 to 50); val (min, cost) = values[which]
+            if (repo.isProductivitySessionRunning()) Toast.makeText(this, "Während Fokus bleibt Social gesperrt.", Toast.LENGTH_SHORT).show()
+            else if (!repo.buySocialTime(min, cost)) Toast.makeText(this, "Nicht genügend Coins.", Toast.LENGTH_SHORT).show()
+            refresh()
+        }.show()
     }
 
-    private fun showPage(page: Int) {
-        selected = page
-        content.removeAllViews()
-        when (page) { 0 -> homePage(); 1 -> tasksPage(); 2 -> walletPage(); 3 -> profilePage() }
-        for (i in 0 until nav.childCount) nav.getChildAt(i).alpha = if (i == selected) 1f else .55f
+    private fun taskDialog() {
+        AlertDialog.Builder(this).setTitle("Aufgaben & Coin-Werte").setItems(arrayOf("Vokabeln lernen • 25 Coins", "Coden lernen • 45 Coins", "Schulaufgaben • 30 Coins", "Lesen • 25 Coins")) { _, which ->
+            val tasks = arrayOf("Vokabeln lernen" to 25, "Coden lernen" to 45, "Schulaufgaben" to 30, "Lesen" to 25); val t = tasks[which]
+            repo.startSession(t.first, 25); refresh()
+        }.show()
     }
 
-    private fun homePage() {
-        header("Guten Tag", "TimeWallet", true)
-        val timerCard = card()
-        timerCard.addView(tv("Fokus-Timer", 17, text, true))
-        val frame = android.widget.FrameLayout(this)
-        timerProgress = CircularProgressIndicator(this).apply { max = 100; progress = 0; isIndeterminate = false; setIndicatorColor(cyan); trackColor = Color.rgb(45, 50, 58); trackThickness = dp(11); indicatorSize = dp(210) }
-        frame.addView(timerProgress, android.widget.FrameLayout.LayoutParams(dp(220), dp(220), Gravity.CENTER))
-        val center = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; gravity = Gravity.CENTER }
-        timerText = tv("25:00", 38, text, true).apply { gravity = Gravity.CENTER }
-        timerStatus = tv("Bereit für Fokus", 12, secondary, false).apply { gravity = Gravity.CENTER; maxLines = 2 }
-        center.addView(timerText); center.addView(timerStatus); frame.addView(center, android.widget.FrameLayout.LayoutParams(dp(190), dp(120), Gravity.CENTER))
-        timerCard.addView(frame, LinearLayout.LayoutParams(-1, 250.dp))
-        messageText = tv("", 13, secondary, false).apply { gravity = Gravity.CENTER; setPadding(4, 4, 4, 4) }
-        timerCard.addView(messageText)
-        content.addView(timerCard)
-
-        val taskInput = EditText(this).apply { hint = "z. B. Vokabeln lernen"; setTextColor(this@MainActivity.text); setHintTextColor(secondary); setSingleLine(true) }
-        val duration = EditText(this).apply { hint = "Min"; inputType = 2; setTextColor(this@MainActivity.text); setHintTextColor(secondary); setText("25"); setSingleLine(true) }
-        content.addView(tv("Schnell starten", 19, text, true).apply { setPadding(0, dp(18), 0, dp(8)) })
-        val row = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
-        row.addView(taskInput, LinearLayout.LayoutParams(0, 56.dp, 1f)); row.addView(duration, LinearLayout.LayoutParams(72.dp, 56.dp).apply { leftMargin = dp(8) }); content.addView(row)
-        content.addView(button("Session starten") { viewModel.startSession(taskInput.text.toString().ifBlank { "Allgemein" }, duration.text.toString().toIntOrNull() ?: 25) })
-        content.addView(button("Foto zur Bestätigung aufnehmen") { cameraLauncher.launch(Intent(this, CameraActivity::class.java)) })
-        content.addView(tv("Deine Produktivität", 19, text, true).apply { setPadding(0, dp(18), 0, dp(8)) })
-        val status = card()
-        status.addView(tv("🛡  Fokus schützt deine Zeit", 16, text, true))
-        val blockerEnabled = isAccessibilityServiceEnabled()
-        status.addView(
-            tv(
-                if (blockerEnabled) "🟢 Social-Blocker aktiv"
-                else "🔴 Social-Blocker noch nicht aktiviert",
-                13,
-                if (blockerEnabled) Color.rgb(80, 220, 140) else Color.rgb(255, 110, 110),
-                true
-            ).apply { setPadding(0, dp(6), 0, 0) }
-        )
-        status.addView(
-            tv(
-                "Während einer Session bleiben Instagram und YouTube gesperrt – auch wenn Social-Zeit gekauft wurde.",
-                13,
-                secondary,
-                false
-            ).apply { setPadding(0, dp(4), 0, 0) }
-        )
-        if (!blockerEnabled) {
-            status.addView(button("Blocker jetzt einrichten") {
-                startActivity(Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS))
-            })
-        }
-        content.addView(status)
+    private fun profileDialog() {
+        val box = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(30, 10, 30, 0) }
+        val name = EditText(this).apply { hint = "Name"; setText(repo.profileName()) }
+        val email = EditText(this).apply { hint = "E-Mail"; setText(repo.profileEmail()) }
+        box.addView(name); box.addView(email)
+        AlertDialogBuilder(this, "Profil", box, "Speichern") { repo.saveProfile(name.text.toString(), email.text.toString()); Toast.makeText(this, "Profil gespeichert", Toast.LENGTH_SHORT).show() }
     }
 
-    private fun tasksPage() {
-        header("Produktivität", "Deine Aufgaben", false)
-        content.addView(tv("Verdiene Coins, indem du echte Zeit in produktive Aufgaben investierst.", 14, secondary, false).apply { setPadding(0, 0, 0, dp(12)) })
-        listOf("📚  Vokabeln lernen" to 25, "💻  Coden lernen" to 45, "🎓  Schulaufgaben" to 30, "📖  Lesen" to 25).forEach { (name, mins) ->
-            val c = card(); c.addView(button("$name   •   $mins Min") { viewModel.startSession(name.substringAfter("  "), mins); showPage(0) }); content.addView(c)
-        }
-        val custom = card(); custom.addView(tv("Eigene Aufgabe", 16, text, true)); val input = EditText(this).apply { hint = "Aufgabe"; setTextColor(this@MainActivity.text); setHintTextColor(secondary); setSingleLine() }; val min = EditText(this).apply { hint = "Minuten"; inputType = 2; setTextColor(this@MainActivity.text); setHintTextColor(secondary); setSingleLine() }; custom.addView(input); custom.addView(min); custom.addView(button("Eigene Session starten") { viewModel.startSession(input.text.toString().ifBlank { "Eigene Aufgabe" }, min.text.toString().toIntOrNull() ?: 25); showPage(0) }); content.addView(custom)
+    private fun emergencyDialog() {
+        val enabled = !repo.isEmergencySwitchEnabled()
+        AlertDialog.Builder(this).setTitle("Notfall-Switch").setMessage(if (enabled) "Emergency-Modus aktivieren? Er darf nur als kontrollierte Ausstiegsmöglichkeit dienen." else "Emergency-Modus deaktivieren?").setPositiveButton(if (enabled) "Aktivieren" else "Deaktivieren") { _, _ -> repo.setEmergencySwitchEnabled(enabled); refresh() }.setNegativeButton("Abbrechen", null).show()
     }
 
-    private fun walletPage() {
-        header("Dein Guthaben", "Social Wallet", false)
-        val balance = card(); coinsText = tv("0 🪙", 34, text, true); balance.addView(coinsText); socialText = tv("0 Minuten verfügbar", 14, secondary, false); balance.addView(socialText); content.addView(balance)
-        content.addView(tv("Zeit kaufen", 19, text, true).apply { setPadding(0, dp(18), 0, dp(8)) })
-        listOf(15 to 15, 30 to 28, 60 to 50).forEach { (minutes, cost) -> content.addView(button("$minutes Minuten     •     $cost 🪙") { if (app.repository.isProductivitySessionRunning()) Toast.makeText(this, "Während Fokus bleibt Social gesperrt.", Toast.LENGTH_SHORT).show() else viewModel.buySocialTime(minutes, cost) }) }
-        content.addView(button("Coin-Verlauf anzeigen") { startActivity(Intent(this, com.example.timewallet.ui.history.CoinHistoryActivity::class.java)) })
-        content.addView(tv("Jeder Kauf wird lokal in deiner Wallet gespeichert. Während Fokus wird gekaufte Zeit nicht verbraucht.", 13, secondary, false).apply { setPadding(0, dp(12), 0, 0) })
-    }
-
-    private fun profilePage() {
-        header("Persönlich", "Profil & Einstellungen", false)
-        val prefs = getSharedPreferences("profile", MODE_PRIVATE)
-        val c = card(); c.addView(tv("Dein Profil", 18, text, true)); val name = EditText(this).apply { hint = "Dein Name"; setText(prefs.getString("name", "")); setTextColor(this@MainActivity.text); setHintTextColor(secondary); setSingleLine() }; c.addView(name); c.addView(button("Profil speichern") { prefs.edit().putString("name", name.text.toString().trim()).apply(); Toast.makeText(this, "Profil gespeichert", Toast.LENGTH_SHORT).show() }); content.addView(c)
-        val blocker = card()
-        val blockerEnabled = isAccessibilityServiceEnabled()
-        blocker.addView(tv("Social-Blocker", 18, text, true))
-        blocker.addView(
-            tv(
-                if (blockerEnabled) "🟢 Aktiv • Instagram und YouTube werden überwacht"
-                else "🔴 Nicht aktiviert • Der Blocker kann noch nicht eingreifen",
-                14,
-                if (blockerEnabled) Color.rgb(80, 220, 140) else Color.rgb(255, 110, 110),
-                true
-            ).apply { setPadding(0, dp(8), 0, 0) }
-        )
-        blocker.addView(
-            tv(
-                "TimeWallet braucht dafür den Android-Zugriff „Bedienungshilfen“. Das ist keine normale App-Berechtigung und muss einmal in den Systemeinstellungen aktiviert werden.",
-                12,
-                secondary,
-                false
-            ).apply { setPadding(0, dp(6), 0, 0) }
-        )
-        blocker.addView(button("Accessibility-Einstellungen öffnen") {
-            startActivity(Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS))
-        })
-        content.addView(blocker)
-
-        val security = card()
-        security.addView(tv("Sicherheit & Anti-Sucht", 18, text, true))
-        val anti = SwitchMaterial(this).apply {
-            text = "Anti-Sucht-Modus"
-            isChecked = app.repository.isAntiAddictionModeEnabled()
-            setTextColor(this@MainActivity.text)
-            setOnCheckedChangeListener { _, checked -> app.repository.setAntiAddictionMode(checked) }
-        }
-        security.addView(anti)
-        val emergency = SwitchMaterial(this).apply {
-            text = "Notfall-Switch aktiv"
-            isChecked = app.repository.isEmergencySwitchEnabled()
-            setTextColor(this@MainActivity.text)
-            setOnCheckedChangeListener { _, checked -> app.repository.setEmergencySwitchEnabled(checked) }
-        }
-        security.addView(emergency)
-        security.addView(
-            tv(
-                "Der Notfall-Switch ist eine Sicherheitsausstiegsmöglichkeit und darf nie zum dauerhaften Aussperren vom eigenen Gerät führen.",
-                12,
-                secondary,
-                false
-            ).apply { setPadding(0, dp(8), 0, 0) }
-        )
-        content.addView(security)
-        content.addView(button("Rechtliches") { startActivity(Intent(this, com.example.timewallet.ui.legal.LegalActivity::class.java)) })
-        content.addView(tv("TimeWallet 1.0 • Material 3 Dark", 12, secondary, false).apply { gravity = Gravity.CENTER; setPadding(0, dp(20), 0, dp(20)) })
-    }
-
-    private fun header(kicker: String, title: String, showCoins: Boolean) {
-        val row = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
-        val logo = TextView(this).apply { text = "TW"; textSize = 17f; gravity = Gravity.CENTER; setTextColor(bg); background = rounded(cyan, 18); typeface = android.graphics.Typeface.DEFAULT_BOLD }
-        row.addView(logo, LinearLayout.LayoutParams(48.dp, 48.dp)); val col = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(12), 0, 0, 0) }; col.addView(tv(kicker, 12, secondary, false)); col.addView(tv(title, 24, text, true)); row.addView(col, LinearLayout.LayoutParams(0, -2, 1f)); if (showCoins) { coinsText = tv("0 🪙", 17, cyan, true).apply { gravity = Gravity.CENTER; background = rounded(surface2, 18); setPadding(dp(12), 0, dp(12), 0) }; row.addView(coinsText, LinearLayout.LayoutParams(-2, 44.dp)) }; content.addView(row); content.addView(View(this).apply { setBackgroundColor(Color.TRANSPARENT) }, LinearLayout.LayoutParams(1, dp(12)))
-    }
-
-    private fun card(): LinearLayout = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(16), dp(16), dp(16), dp(16)); background = rounded(surface, 24); layoutParams = lp(1, 10) }
-    private fun button(label: String, action: () -> Unit): MaterialButton = MaterialButton(this).apply { text = label; setTextSize(14f); isAllCaps = false; setTextColor(bg); backgroundTintList = android.content.res.ColorStateList.valueOf(cyan); cornerRadius = dp(16); minHeight = dp(52); setOnClickListener { action() }; layoutParams = lp(1, 8) }
-    private fun tv(value: String, size: Int, color: Int, bold: Boolean): TextView = TextView(this).apply { text = value; textSize = size.toFloat(); setTextColor(color); if (bold) typeface = android.graphics.Typeface.DEFAULT_BOLD }
-    private fun rounded(color: Int, radius: Int) = GradientDrawable().apply { setColor(color); cornerRadius = dp(radius).toFloat() }
-    private fun lp(w: Int, margin: Int) = LinearLayout.LayoutParams(if (w == 1) -1 else w, -2).apply { topMargin = dp(margin) }
-    private fun isAccessibilityServiceEnabled(): Boolean {
-        val enabled = android.provider.Settings.Secure.getString(
-            contentResolver,
-            android.provider.Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
-        ) ?: return false
-        val expected = android.content.ComponentName(
-            this,
-            com.example.timewallet.service.SocialBlockerService::class.java
-        )
-        return enabled.split(':').any { android.content.ComponentName.unflattenFromString(it) == expected }
-    }
-
-    companion object {
-        const val EXTRA_TASK = "task"
-        const val EXTRA_MINUTES = "minutes"
-    }
-
-    private fun dp(v: Int) = (v * resources.displayMetrics.density).toInt()
-    private val Int.dp get() = dp(this)
-}
-
-// Kept as a tiny local adapter so MainActivity has no dependency on deprecated factories.
-private class TimerViewModelFactoryCompat(private val app: TimeWalletApp) : androidx.lifecycle.ViewModelProvider.Factory {
-    override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(TimerViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return TimerViewModel(app) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel: ${modelClass.name}")
-    }
+    private fun addText(value: String, size: Int, color: Int, bold: Boolean) { root.addView(TextView(this).apply { text = value; textSize = size.toFloat(); setTextColor(color); if (bold) typeface = android.graphics.Typeface.DEFAULT_BOLD; setPadding(0, 6, 0, 4) }) }
+    private fun addButton(label: String, action: () -> Unit) { root.addView(Button(this).apply { text = label; setTextColor(white); setOnClickListener { action() }; backgroundTintList = android.content.res.ColorStateList.valueOf(Color.rgb(32, 38, 48)); setPadding(12, 6, 12, 6) }, LinearLayout.LayoutParams(-1, 54).apply { topMargin = 8 }) }
+    private fun AlertDialogBuilder(context: android.content.Context, title: String, view: LinearLayout, positive: String, action: () -> Unit) { AlertDialog.Builder(context).setTitle(title).setView(view).setPositiveButton(positive) { _, _ -> action() }.setNegativeButton("Abbrechen", null).show() }
 }
