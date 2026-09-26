@@ -1,9 +1,7 @@
 <resources>
-
-    <style name="TeslaDialog" parent="Theme.Material3.Dark.Dialog">
+    <style name="TeslaDialog" parent="Theme.AppCompat.Dialog">
         <item name="android:background">#111111</item>
         <item name="android:textColor">#FFFFFF</item>
-        <item name="colorPrimary">#00E5FF</item>
+        <item name="colorAccent">#00E5FF</item>
     </style>
-
 </resources>
